@@ -67,11 +67,18 @@ class CompanyController extends Controller
                 'errors'=>$validator->messages(),
             ]);
         } 
-        Company::create($request->all());
-         return response()->json([
-            'status' =>'200',
-            'message' => 'Data Added sucessfully'
-         ]);
+        try {
+            Company::create($request->all());
+            return response()->json([
+               'status' =>'200',
+               'message' => 'Data Added sucessfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR); 
+        }
+       
     }
 
     /**
@@ -118,13 +125,18 @@ class CompanyController extends Controller
                 'errors'=>$validator->messages(),
             ]);
         } 
-
-        $company = Company::find($id);
-        $company->update($request->all());
-        return response()->json([
-            'status' =>'200',
-            'message' => 'Data Added sucessfully'
-        ]);       
+        try {
+            $company = Company::find($id);
+            $company->update($request->all());
+            return response()->json([
+                'status' =>'200',
+                'message' => 'Data Updated sucessfully'
+            ]); 
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }    
 
     }
 

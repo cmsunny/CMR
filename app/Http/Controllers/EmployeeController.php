@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Employee;
-use Illuminate\Http\Request;
+use Illuminate\Http\Request; 
 use DataTables;
 use App\Models\Company;
 use Illuminate\Support\Facades\Validator;
@@ -80,11 +80,18 @@ class EmployeeController extends Controller
                 'errors'=>$validator->messages(),
             ]);
         } 
-        Employee::create($request->all());
-        return response()->json([
-            'status' =>'200',
-            'message' => 'Data Added sucessfully'
-        ]);        
+        try {
+            Employee::create($request->all());
+            return response()->json([
+                'status' =>'200',
+                'message' => 'Data Added sucessfully'
+            ]); 
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR); 
+        }
+              
     }
 
     /**
@@ -130,13 +137,20 @@ class EmployeeController extends Controller
                 'errors'=>$validator->messages(),
             ]);
         } 
+        try {
+            $employee = Employee::find($id);
+            $employee->update($request->all());
+            return response()->json([
+                'status' =>'200',
+                'message' => 'Data Updated sucessfully'
+            ]);   
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR); 
+        }
 
-        $employee = Employee::find($id);
-        $employee->update($request->all());
-        return response()->json([
-            'status' =>'200',
-            'message' => 'Data Added sucessfully'
-        ]);       
+           
 
     }
 
