@@ -20,12 +20,15 @@
                     <li class="nk-menu-heading">
                         <h6 class="overline-title text-primary-alt">Dashboards</h6>
                     </li><!-- .nk-menu-item -->
+                    @can('list_company')
                     <li class="nk-menu-item">
                         <a href="{{ route('company.index') }}" class="nk-menu-link">
                             <span class="nk-menu-icon"><em class="icon ni ni-dashlite"></em></span>
                             <span class="nk-menu-text">Company</span>
                         </a>
-                    </li><!-- .nk-menu-item -->
+                    </li>
+                    @endcan
+                    <!-- .nk-menu-item -->
                     <li class="nk-menu-item">
                         <a href="{{ route('employee.index') }}" class="nk-menu-link">
                             <span class="nk-menu-icon"><em class="icon ni ni-dashlite"></em></span>

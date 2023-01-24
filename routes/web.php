@@ -16,7 +16,7 @@ use App\Http\Controllers\EmployeeController;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('auth.login');
 });
 
 Route::group([ 'middleware' => 'auth'], function () {
@@ -27,6 +27,9 @@ Route::group([ 'middleware' => 'auth'], function () {
     Route::resource('company', CompanyController::class);
     Route::resource('employee', EmployeeController::class);
 
+    // Route::group(['middleware' => ['can:publish articles']], function () {
+    //     //
+    // });
    
 });
 require __DIR__.'/auth.php';

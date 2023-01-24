@@ -11,6 +11,13 @@ use Illuminate\Http\JsonResponse;
 
 class EmployeeController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('can:list_employee')->only('index');
+        $this->middleware('can:create_employee')->only(['create', 'store']);
+        $this->middleware('can:edit_employee')->only(['edit', 'update']);
+        $this->middleware('can:delete_employee')->only(['delete']);
+    }
     /**
      * Display a listing of the resource.
      *
@@ -27,10 +34,19 @@ class EmployeeController extends Controller
                 })
             ->addIndexColumn()
             ->addColumn('action', function($row){
+                    // @can('list_company')
+                    $btn = '';
+                    if(auth()->user()->hasPermissionTo('edit_employee')) { 
 
-                   $btn = '<a href="javascript:void(0)" data-toggle="tooltip"  data-id="'.$row->id.'" data-original-title="Edit" class="edit btn btn-primary btn-sm editProduct">Edit</a>';
+                        $btn = '<a href="javascript:void(0)" data-toggle="tooltip"  data-id="'.$row->id.'" data-original-title="Edit" class="edit btn btn-primary btn-sm editProduct">Edit</a>';
+                    }
+                    if(auth()->user()->hasPermissionTo('delete_employee')) {
+                        $btn = $btn.' <a href="javascript:void(0)" data-toggle="tooltip"  data-id="'.$row->id.'" data-original-title="Delete" class="btn btn-danger btn-sm deleteProduct">Delete</a>';
+                    }
 
-                   $btn = $btn.' <a href="javascript:void(0)" data-toggle="tooltip"  data-id="'.$row->id.'" data-original-title="Delete" class="btn btn-danger btn-sm deleteProduct">Delete</a>';
+                //    $btn = '<a href="javascript:void(0)" data-toggle="tooltip"  data-id="'.$row->id.'" data-original-title="Edit" class="edit btn btn-primary btn-sm editProduct">Edit</a>';
+
+                //    $btn = $btn.' <a href="javascript:void(0)" data-toggle="tooltip"  data-id="'.$row->id.'" data-original-title="Delete" class="btn btn-danger btn-sm deleteProduct">Delete</a>';
 
                     return $btn;
             })
@@ -69,6 +85,7 @@ class EmployeeController extends Controller
         $validator = Validator::make($request->all(), [
             'fname' => 'required',
             'lname' => 'required',
+            'company'=>'required',
             'email'=> 'nullable|email',
             'phone' => 'nullable|numeric|digits:11'
             

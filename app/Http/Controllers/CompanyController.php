@@ -3,12 +3,22 @@
 namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Validator;
 use DataTables;
+use Illuminate\Support\Facades\File;
 use Illuminate\Http\Request;
 use App\Models\Company;
+use Illuminate\Validation\Rule;
 use Illuminate\Http\JsonResponse;
 
 class CompanyController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('can:list_company')->only('index');
+        $this->middleware('can:create_company')->only(['create', 'store']);
+        $this->middleware('can:edit_company')->only(['edit', 'update']);
+        $this->middleware('can:delete_company')->only(['delete']);
+    }
     /**
      * Display a listing of the resource.
      *
@@ -18,7 +28,7 @@ class CompanyController extends Controller
     {
      
         if ($request->ajax()) {
-            $data = Company::latest()->get();
+            $data = Company::all();
   
             return Datatables::of($data)
             ->addIndexColumn()
@@ -29,8 +39,11 @@ class CompanyController extends Controller
                    $btn = $btn.' <a href="javascript:void(0)" data-toggle="tooltip"  data-id="'.$row->id.'" data-original-title="Delete" class="btn btn-danger btn-sm deleteProduct">Delete</a>';
 
                     return $btn;
+            })->addColumn('image',function($row){
+                $src = asset('storage/'.$row->image);
+                return '<img src=" '.$src.'" border="0" width="40" height="40px" class="img-rounded" align="center" />';
             })
-            ->rawColumns(['action'])
+            ->rawColumns(['action','image'])
             ->make(true);
         }
         
@@ -55,9 +68,11 @@ class CompanyController extends Controller
      */
     public function store(Request $request)
     {
+        // dd($request->all());
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'email' => 'required|email|unique:companies',
+            'image' => 'required',
             'website' => 'required|url'
         ]);
         if($validator->fails())
@@ -68,7 +83,11 @@ class CompanyController extends Controller
             ]);
         } 
         try {
-            Company::create($request->all());
+            $data = $request->except('image');
+            if($request->hasFile('image')){
+                $data['image'] = saveResizeImage($request->image, 'images/companies', 550);
+            }
+            Company::create($data);
             return response()->json([
                'status' =>'200',
                'message' => 'Data Added sucessfully'
@@ -115,19 +134,29 @@ class CompanyController extends Controller
     {  
         $validator = Validator::make($request->all(), [
             'name' => 'required',
-            'email' => 'required|email',
+            'email' => ['required', 'email',
+                Rule::unique('companies')->ignore($id)
+            ],
             'website' => 'required|url'
         ]);
         if($validator->fails())
         {
             return response()->json([
-                'status'=>400,
+                'status'=>402,
                 'errors'=>$validator->messages(),
             ]);
         } 
         try {
+            $data = $request->except(['_token','_method','image']);
+            $company = Company::findOrfail($id);
+            if($request->hasFile('image')){
+                if(File::exists($company->image)) {
+                    File::delete($company->image);
+                }
+                $data['image'] = saveResizeImage($request->image, 'images/companies', 550);
+            }
             $company = Company::find($id);
-            $company->update($request->all());
+            $company->update($data);
             return response()->json([
                 'status' =>'200',
                 'message' => 'Data Updated sucessfully'
@@ -152,4 +181,6 @@ class CompanyController extends Controller
      
         return response()->json(['success'=>'Company deleted successfully.']);
     }
+
+   
 }

@@ -2,32 +2,35 @@
 
 @section('content') 
                     
-<div class="container">
+
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Employee</h1>
-        <a class="btn btn-sm btn-dark" href="javascript:void(0)" id="createNewProduct"> Add new </a>
+        {{-- <button type="button" class="btn btn-primary" href="javascript:void(0)" data-toggle="modal" data-target="#modalDefault" id="createNewProduct">Add Data</button> --}}
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalDefault" id="createNewProduct">Add Data</button>
     </div>
-</div>
-    <div class="datatable-wrap my-3">
- <table class=" data-table nowrap table dataTable no-footer  collapsed" aria-describedby='DataTables_Table_0_info'>
+    <div class="card card-preview">
+    <div class="card-inner">
+ <table class=" data-table nowrap table dataTable no-footer  collapsed" >
   <thead>
      <tr>
-        <th class="sorting sorting_asc" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Name: activate to sort column descending">No</th>
-        <th class="sorting sorting_asc" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Name: activate to sort column descending">First Name</th>
-        <th class="sorting sorting_asc" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Name: activate to sort column descending">Last Name</th>
-        <th class="sorting sorting_asc" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Name: activate to sort column descending">Company</th>
-        <th class="sorting sorting_asc" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Name: activate to sort column descending">Email</th>
-        <th class="sorting sorting_asc" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Name: activate to sort column descending">Phone</th>
-        <th class="sorting sorting_asc" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Name: activate to sort column descending">Auction</th>
+        <th>No</th>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Company</th>
+        <th>Email</th>
+        <th>Phone</th>
+        @can('edit_employee','delete_employee')
+            <th>Action</th>
+        @endcan
        
      </tr>
   </thead>
  </table>
 </div>
-
+</div>
 
 {{-- Modal --}}
-<div class="modal" id="ajaxModel" tabindex="-1">
+<div class="modal fade" tabindex="-1" id="ajaxModel" tabindex="-1">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -57,8 +60,9 @@
                         <label for="company" class="col-sm-2 control-label">Company</label>
                         <div class="col-sm-12">
                             <select id="company" class="form-control" name="company_id" placeholder="Enter company Name" value="">
-                                @foreach ($companies as $company)
                                 
+                                <option value="">Select Company</option>
+                                @foreach ($companies as $company)
                                 <option value="{{$company->id}}" id="option">{{$company->name}}</option>                                    
                                 @endforeach
                               </select>
@@ -87,9 +91,7 @@
                     </div>
                 </form>
             </div>
-            <div class="modal-footer bg-light">
-                <span class="sub-text"></span>
-            </div>
+           
         </div>
     </div>
 </div>
@@ -119,8 +121,7 @@
               $('#productForm').trigger("reset");
               $('#modelHeading').html("Create New Data");
               $('#ajaxModel').modal('show');
-
-              
+              resetErrorMessag();
           });
         
    
@@ -139,8 +140,19 @@
                   $('#company').val(data.company_id);
                   $('#email').val(data.email);
                   $('#phone').val(data.phone);
+
+                  resetErrorMessag();
               });
           });
+
+
+        //   $('.editProduct').click(function(e){
+        //     e.preventDefault();
+        //     console.log('edit button');
+        //     $('.fname_err').text('');
+        //     $('.lname_err').text('');
+        //     $('.company_err').text('');
+        //   })
         
       
             //   Create Product Code
@@ -155,9 +167,11 @@
                   createCompmany();
               }
           });
+
   
           function updateCompnay(id)
            {
+             resetErrorMessag();
               var url = '{{ route("employee.update", ":id") }}';
               url = url.replace(':id', id);
   
@@ -173,9 +187,26 @@
                   }
                   if(data.status == '200')
                   {
-                  $('#productForm').trigger("reset");
-                  $('#ajaxModel').modal('hide');
-                  table.draw();
+                    
+                    Swal.fire({
+                    title: 'Do you want to save the changes?',
+                    showDenyButton: true,
+                    showCancelButton: true,
+                    confirmButtonText: 'Save',
+                    denyButtonText: `Don't save`,
+                    }).then((result) => {
+                    /* Read more about isConfirmed, isDenied below */
+                    if (result.isConfirmed) {
+                        Swal.fire('Saved!', '', 'success')
+                        $('#productForm').trigger("reset");
+                        $('#ajaxModel').modal('hide');
+                        table.draw();
+                    } else if (result.isDenied) {
+                        Swal.fire('Changes are not saved', '', 'info')
+                    }
+                    })
+                  
+                 
                   }           
               }
               });
@@ -183,7 +214,8 @@
   
          function createCompmany()
            {
-              var url = '{{ route("employee.store") }}';
+                resetErrorMessag();
+                var url = '{{ route("employee.store") }}';
                
                   $.ajax({
                   data: $('#productForm').serialize(),
@@ -198,6 +230,14 @@
                       }
                       if(data.status == '200')
                       {
+                        
+                        Swal.fire({
+                        position: 'top-center',
+                        icon: 'success',
+                        title: data.message,
+                        showConfirmButton: false,
+                        timer: 1500
+                        })
                       $('#productForm').trigger("reset");
                       $('#ajaxModel').modal('hide');
                       table.draw();
@@ -212,21 +252,58 @@
         //   Delete Product Code
       
       $('body').on('click', '.deleteProduct', function () {
+
+        const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+                confirmButton: 'btn btn-success',
+                cancelButton: 'btn btn-danger'
+            },
+            buttonsStyling: false
+            })
+
+            swalWithBootstrapButtons.fire({
+            title: 'Are you sure?',
+            text: "You want to delete it !",
+            icon: 'warning',
+            showCancelButton: true,
+            cancelButtonText: 'No, cancel!',
+            confirmButtonText: 'Yes, delete it!',
+            reverseButtons: true
+            }).then((result) => {
+            if (result.isConfirmed) {
+                swalWithBootstrapButtons.fire(
+                'Deleted!',
+                'Your file has been deleted.',
+                'success'
+                )
+                var product_id = $(this).data("id");
+                
+                $.ajax({
+                    type: "DELETE",
+                    url: "{{ route('employee.store') }}"+'/'+product_id,
+                    success: function (data) {
+                        table.draw();
+                    },
+            
+                    error: function (data) {
+                        console.log('Error:', data);
+                    }
+                });
+
+            } else if (
+                /* Read more about handling dismissals below */
+                result.dismiss === Swal.DismissReason.cancel
+            ) {
+                swalWithBootstrapButtons.fire(
+                'Cancelled',
+                'Your Data is safe :)',
+                'error'
+                )
+            }
+            })
+
+
        
-          var product_id = $(this).data("id");
-          confirm("Are You sure want to delete !");
-          
-          $.ajax({
-              type: "DELETE",
-              url: "{{ route('employee.store') }}"+'/'+product_id,
-              success: function (data) {
-                  table.draw();
-              },
-       
-              error: function (data) {
-                  console.log('Error:', data);
-              }
-          });
       });
         
        //   Render DataTable
@@ -242,7 +319,9 @@
               {data: 'company', name: 'company_id'},
               {data: 'email', name: 'email'},
               {data: 'phone', name: 'phone'},
+              @can('edit_employee','delete_employee')
               {data: 'action', name: 'action', orderable: false, searchable: false},
+              @endcan
           ]
       });
   
@@ -251,6 +330,12 @@
           $.each( msg, function( key, value ) {
             $('.'+key+'_err').text(value);
           });
+      }
+
+      function resetErrorMessag() {
+        $('.fname_err').text('');
+        $('.lname_err').text('');
+        $('.company_err').text('');
       }
          
     });
