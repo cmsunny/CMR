@@ -121,8 +121,7 @@
               $('#productForm').trigger("reset");
               $('#modelHeading').html("Create New Data");
               $('#ajaxModel').modal('show');
-
-              
+              resetErrorMessag();
           });
         
    
@@ -141,8 +140,19 @@
                   $('#company').val(data.company_id);
                   $('#email').val(data.email);
                   $('#phone').val(data.phone);
+
+                  resetErrorMessag();
               });
           });
+
+
+        //   $('.editProduct').click(function(e){
+        //     e.preventDefault();
+        //     console.log('edit button');
+        //     $('.fname_err').text('');
+        //     $('.lname_err').text('');
+        //     $('.company_err').text('');
+        //   })
         
       
             //   Create Product Code
@@ -157,9 +167,11 @@
                   createCompmany();
               }
           });
+
   
           function updateCompnay(id)
            {
+             resetErrorMessag();
               var url = '{{ route("employee.update", ":id") }}';
               url = url.replace(':id', id);
   
@@ -175,6 +187,7 @@
                   }
                   if(data.status == '200')
                   {
+                    
                     Swal.fire({
                     title: 'Do you want to save the changes?',
                     showDenyButton: true,
@@ -201,7 +214,8 @@
   
          function createCompmany()
            {
-              var url = '{{ route("employee.store") }}';
+                resetErrorMessag();
+                var url = '{{ route("employee.store") }}';
                
                   $.ajax({
                   data: $('#productForm').serialize(),
@@ -316,6 +330,12 @@
           $.each( msg, function( key, value ) {
             $('.'+key+'_err').text(value);
           });
+      }
+
+      function resetErrorMessag() {
+        $('.fname_err').text('');
+        $('.lname_err').text('');
+        $('.company_err').text('');
       }
          
     });

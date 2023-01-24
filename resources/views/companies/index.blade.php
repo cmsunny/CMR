@@ -112,9 +112,10 @@
         $('#createNewProduct').click(function () {
             $('#saveBtn').val("create-product");
             $('#product_id').val('');
-            // $('#productForm').trigger("reset");
+            $('#productForm').trigger("reset");
             $('#modelHeading').html("Create New Data");
             $('#ajaxModel').modal('show');
+            resetErrorMessag();
             
           
         });
@@ -126,9 +127,9 @@
         --------------------------------------------*/
         $('body').on('click', '.editProduct', function () {
         var product_id = $(this).data('id');
-        
+                resetErrorMessag();
             $.get("{{ route('company.index') }}" +'/' + product_id +'/edit', function (data) {
-                $('#modelHeading').html("Edit Product");
+                $('#modelHeading').html("Edit Company");
                 $('#saveBtn').val("edit-user");
                 $('#ajaxModel').modal('show');
                 $('#product_id').val(data.id);
@@ -162,7 +163,7 @@
         }))
         function updateCompnay(id, formData)
         {
-            
+            resetErrorMessag();
             formData.append('_method', 'PUT');
             var url = '{{ route("company.update", ":id") }}';
             url = url.replace(':id', id); 
@@ -208,7 +209,7 @@
 
       function createCompmany(formData)
        {
-          
+            resetErrorMessag();
             var url = '{{ route("company.store") }}';
                 $.ajax({
                 data: formData,
@@ -329,6 +330,13 @@
             $('.'+key+'_err').text(value);
             });
         }
+        // Reset Error
+        function resetErrorMessag() {
+        $('.name_err').text('');
+        $('.email_err').text('');
+        $('.image_err').text('');
+        $('.website_err').text('');
+      }
         
     });
 
