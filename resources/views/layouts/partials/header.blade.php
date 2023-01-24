@@ -46,12 +46,12 @@
                                     <li><a class="dark-switch" href="#"><em class="icon ni ni-moon"></em><span>Dark Mode</span></a></li>
                                 </ul>
                             </div> --}}
+                           
                             <div class="dropdown-inner">
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
-                
                                     <x-dropdown-link :href="route('logout')"
-                                            onclick="event.preventDefault();
+                                            onclick="event.preventDefault(); 
                                                         this.closest('form').submit();">
                                                         <em class="icon ni ni-signout"></em>
                                         {{ __('Log Out') }}

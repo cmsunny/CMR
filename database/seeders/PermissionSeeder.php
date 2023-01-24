@@ -55,7 +55,8 @@ class PermissionSeeder extends Seeder
         $adminPermissions = Permission::get();
         $admin->permissions()->sync($adminPermissions);
         $subAdmin = Role::create([ 'name'=> 'subadmin' ]);
-        $subAdminPermissions = Permission::where('name', 'create_employee')->first();
-        $subAdmin->permissions()->sync($subAdminPermissions->id);
+        $subAdminPermissions = Permission::where('name', 'create_employee')->orWhere('name', 'list_employee')->get();
+        $subAdmin->permissions()->sync($subAdminPermissions);
+
     }
 }
