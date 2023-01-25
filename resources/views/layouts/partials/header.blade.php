@@ -2,11 +2,13 @@
  <div class="nk-header nk-header-fixed is-light">
     <div class="container-fluid">
         <div class="nk-header-wrap">
-           
-            
+            <div class="nk-menu-trigger d-xl-none ml-n1">
+                <a href="#" class="nk-nav-toggle nk-quick-nav-icon" data-target="sidebarMenu"><em class="icon ni ni-menu"></em></a>
+            </div>
+
             <div class="nk-header-tools">
                 <ul class="nk-quick-nav">
-                
+
                     <li class="dropdown user-dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                             <div class="user-toggle">
@@ -14,9 +16,9 @@
                                     <em class="icon ni ni-user-alt"></em>
                                 </div>
                                 <div class="user-info d-none d-md-block">
-                                    
-                                    
-                                    <div class="user-status">{{ Auth::user()->name }}</div> 
+
+
+                                    <div class="user-status">{{ Auth::user()->name }}</div>
                                     <div class="user-name dropdown-indicator">{{ Auth::user()->email }}</div>
                                 </div>
                             </div>
@@ -27,7 +29,7 @@
                                     <div class="user-avatar">
                                         <span>AB</span>
                                     </div>
-                                    
+
                                 {{-- <div class="media-body">
                                     <h6 class="pro-user-name mt-0 mb-0">{{auth()->user()->user_name ?? ucwords(auth()->user()->name)}}</h6>
                                     <span class="pro-user-desc">{{ucwords(getUserRole(auth()->user()) ? getUserRole(auth()->user())->title : null)}}</span>
@@ -46,12 +48,12 @@
                                     <li><a class="dark-switch" href="#"><em class="icon ni ni-moon"></em><span>Dark Mode</span></a></li>
                                 </ul>
                             </div> --}}
-                           
+
                             <div class="dropdown-inner">
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
                                     <x-dropdown-link :href="route('logout')"
-                                            onclick="event.preventDefault(); 
+                                            onclick="event.preventDefault();
                                                         this.closest('form').submit();">
                                                         <em class="icon ni ni-signout"></em>
                                         {{ __('Log Out') }}
@@ -63,7 +65,7 @@
                             </div>
                         </div>
                     </li><!-- .dropdown -->
-                    
+
                 </ul><!-- .nk-quick-nav -->
             </div><!-- .nk-header-tools -->
         </div><!-- .nk-header-wrap -->

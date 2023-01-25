@@ -2,13 +2,13 @@
 
 @section('content')
 
-
+<div class="nk-block nk-block-lg">
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>Companies</h1>
     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalDefault" id="createNewProduct">Add Data</button>
 </div>
     <div class="card card-preview">
-        <div class="card-inner">
+        <div class="card-inner table-responsive">
     <table class=" nowrap table dataTable no-footer dtr-inline"  id="data-table">
         <thead>
             <tr>
@@ -18,7 +18,7 @@
                 <th>Logo</th>
                 <th>Website</th>
                 <th>Action</th>
-            
+
             </tr>
         </thead>
         <tbody>
@@ -26,7 +26,7 @@
     </table>
 </div>
 </div>
-          
+</div>
 <div class="modal fade" tabindex="-1" id="ajaxModel" style="display: none;" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -45,7 +45,7 @@
                             <input type="text" class="form-control" id="name" name="name" placeholder="Enter Name" value="" maxlength="50" >
                             <span class="text-danger error-text name_err"></span>
                         </div>
-                        
+
                     </div>
                     <div class="form-group">
                         <label for="email" class="col-sm-2 control-label">Email</label>
@@ -53,7 +53,7 @@
                             <input type="text" class="form-control" id="email" name="email" placeholder="Enter Email" value="" maxlength="50" >
                             <span class="text-danger error-text email_err"></span>
                         </div>
-                       
+
                     </div>
 
                     <div class="form-group">
@@ -66,37 +66,38 @@
                             </div>
                         </div>
                     </div>
-       
+
                     <div class="form-group">
                         <label class="col-sm-2 control-label">Website</label>
                         <div class="col-sm-12">
                             <input type="text" class="form-control" id="website" name="website"  placeholder="Enter Website URL" class="form-control">
                             <span class="text-danger error-text website_err"></span>
                         </div>
-                        
+
                     </div>
-        
+
                     <div class="col-sm-offset-2 col-sm-10">
-                     
+
                      <button type="submit" class="btn btn-primary" data-toggle="modal" data-target="#modalDefault" id="saveBtn">Save Data</button>
                     </div>
                 </form>
             </div>
-           
+
         </div>
     </div>
 </div>
+
 @endsection
 
 @push('scripts')
 <script type="text/javascript">
   $(function () {
-      
+
         /*------------------------------------------
         --------------------------------------------
         Pass Header Token
         --------------------------------------------
-        --------------------------------------------*/ 
+        --------------------------------------------*/
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -116,10 +117,10 @@
             $('#modelHeading').html("Create New Data");
             $('#ajaxModel').modal('show');
             resetErrorMessag();
-            
-          
+
+
         });
-      
+
         /*------------------------------------------
         --------------------------------------------
         Click to Edit Button
@@ -138,14 +139,14 @@
                 $('#website').val(data.website);
             });
         });
-      
+
     /*------------------------------------------
     --------------------------------------------
     Create Update Code
     --------------------------------------------
     // --------------------------------------------*/
-  
-        $('#productForm').on('submit',(function(e) { 
+
+        $('#productForm').on('submit',(function(e) {
             e.preventDefault();
             var formData = new FormData(this);
             var id = $("#product_id").val()
@@ -155,7 +156,7 @@
 
             if(id) {
                 updateCompnay(id,formData);
-                
+
             } else {
                 createCompmany(formData);
             }
@@ -166,7 +167,7 @@
             resetErrorMessag();
             formData.append('_method', 'PUT');
             var url = '{{ route("company.update", ":id") }}';
-            url = url.replace(':id', id); 
+            url = url.replace(':id', id);
             $.ajax({
             data: formData,
             url: url,
@@ -180,7 +181,7 @@
                     printErrorMsg(data.errors);
                 }
                 if(data.status == '200')
-                {   
+                {
                     Swal.fire({
                     title: 'Do you want to save the changes?',
                     showDenyButton: true,
@@ -200,9 +201,9 @@
                     })
 
 
-                   
-                
-                }            
+
+
+                }
             }
             });
        }
@@ -236,15 +237,15 @@
                         })
                         $('#productForm').trigger("reset");
                         $('#ajaxModel').modal('hide');
-                    
+
                         table.draw();
                     }
-                 
+
                 }
            });
       };
 
-      
+
     /*------------------------------------------
     --------------------------------------------
     Delete  Code
@@ -274,8 +275,8 @@
                 'Your file has been deleted.',
                 'success'
                 )
-                var product_id = $(this).data("id");                
-                
+                var product_id = $(this).data("id");
+
                 $.ajax({
                     type: "DELETE",
                     url: "{{ route('company.store') }}"+'/'+product_id,
@@ -298,12 +299,12 @@
                 )
             }
             })
-       
-         
 
-        
-     
-        
+
+
+
+
+
     });
       /*------------------------------------------
     --------------------------------------------
@@ -337,10 +338,10 @@
         $('.image_err').text('');
         $('.website_err').text('');
       }
-        
+
     });
 
-  
-  
+
+
 </script>
 @endpush

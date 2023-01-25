@@ -11,12 +11,13 @@
               <img class="logo-light logo-img" src="{{ asset('/images/logo.png') }}" srcset="{{ asset('/images/logo.png') }}" alt="logo-dark">
             </a>
             </div>
-    </div><!-- .nk-sidebar-element -->
+        </div>
+    <!-- .nk-sidebar-element -->
     <div class="nk-sidebar-element nk-sidebar-body">
         <div class="nk-sidebar-content">
             <div class="nk-sidebar-menu" data-simplebar>
                 <ul class="nk-menu">
-                   
+
                     <li class="nk-menu-heading">
                         <h6 class="overline-title text-primary-alt">Dashboards</h6>
                     </li><!-- .nk-menu-item -->
@@ -35,8 +36,8 @@
                             <span class="nk-menu-text">Employee</span>
                         </a>
                     </li><!-- .nk-menu-item -->
-                    
-                    
+
+
 
                <!-- .nk-menu -->
             </div><!-- .nk-sidebar-menu -->

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('content') 
-                    
+@section('content')
+
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Employee</h1>
@@ -22,7 +22,7 @@
         @can('edit_employee','delete_employee')
             <th>Action</th>
         @endcan
-       
+
      </tr>
   </thead>
  </table>
@@ -60,13 +60,13 @@
                         <label for="company" class="col-sm-2 control-label">Company</label>
                         <div class="col-sm-12">
                             <select id="company" class="form-control" name="company_id" placeholder="Enter company Name" value="">
-                                
+
                                 <option value="">Select Company</option>
                                 @foreach ($companies as $company)
-                                <option value="{{$company->id}}" id="option">{{$company->name}}</option>                                    
+                                <option value="{{$company->id}}" id="option">{{$company->name}}</option>
                                 @endforeach
                               </select>
-                            <span class="text-danger error-text company_err"></span>
+                            <span class="text-danger error-text company_id_err"></span>
                         </div>
                     </div>
                     <div class="form-group">
@@ -76,7 +76,7 @@
                             <span class="text-danger error-text email_err"></span>
                         </div>
                     </div>
-       
+
                     <div class="form-group">
                         <label class="col-sm-2 control-label">Phone</label>
                         <div class="col-sm-12">
@@ -84,14 +84,14 @@
                             <span class="text-danger error-text phone_err"></span>
                         </div>
                     </div>
-        
+
                     <div class="modal-footer">
-                     <button type="button" class="btn btn-primary add-employee" id="saveBtn" value="create">Save 
+                     <button type="button" class="btn btn-primary add-employee" id="saveBtn" value="create">Save
                      </button>
                     </div>
                 </form>
             </div>
-           
+
         </div>
     </div>
 </div>
@@ -100,21 +100,21 @@
 @push('scripts')
 <script type="text/javascript">
     $(function () {
-        
-         
+
+
             //   Pass Header Token
-        
+
           $.ajaxSetup({
               headers: {
                   'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
               }
           });
-        
-    
-        
-        
+
+
+
+
             //   Click to Button
-   
+
           $('#createNewProduct').click(function () {
               $('#saveBtn').val("create-product");
               $('#product_id').val('');
@@ -123,13 +123,13 @@
               $('#ajaxModel').modal('show');
               resetErrorMessag();
           });
-        
-   
+
+
            //   Click to Edit Button
-     
+
           $('body').on('click', '.editProduct', function () {
           var product_id = $(this).data('id');
-          
+
               $.get("{{ route('employee.index') }}" +'/' + product_id +'/edit', function (data) {
                   $('#modelHeading').html("Edit Employee");
                   $('#saveBtn').val("edit-user");
@@ -140,7 +140,6 @@
                   $('#company').val(data.company_id);
                   $('#email').val(data.email);
                   $('#phone').val(data.phone);
-
                   resetErrorMessag();
               });
           });
@@ -153,10 +152,10 @@
         //     $('.lname_err').text('');
         //     $('.company_err').text('');
         //   })
-        
-      
+
+
             //   Create Product Code
-     
+
           $('#saveBtn').click(function (e) {
               e.preventDefault();
               $(this).html('Save');
@@ -168,13 +167,13 @@
               }
           });
 
-  
+
           function updateCompnay(id)
            {
-             resetErrorMessag();
+              resetErrorMessag();
               var url = '{{ route("employee.update", ":id") }}';
               url = url.replace(':id', id);
-  
+
               $.ajax({
               data: $('#productForm').serialize(),
               url: url,
@@ -187,7 +186,7 @@
                   }
                   if(data.status == '200')
                   {
-                    
+
                     Swal.fire({
                     title: 'Do you want to save the changes?',
                     showDenyButton: true,
@@ -205,18 +204,18 @@
                         Swal.fire('Changes are not saved', '', 'info')
                     }
                     })
-                  
-                 
-                  }           
+
+
+                  }
               }
               });
          }
-  
+
          function createCompmany()
            {
                 resetErrorMessag();
                 var url = '{{ route("employee.store") }}';
-               
+
                   $.ajax({
                   data: $('#productForm').serialize(),
                   url: url,
@@ -230,7 +229,7 @@
                       }
                       if(data.status == '200')
                       {
-                        
+
                         Swal.fire({
                         position: 'top-center',
                         icon: 'success',
@@ -242,15 +241,15 @@
                       $('#ajaxModel').modal('hide');
                       table.draw();
                       }
-                  
+
                   }
              });
         };
-  
-        
-      
+
+
+
         //   Delete Product Code
-      
+
       $('body').on('click', '.deleteProduct', function () {
 
         const swalWithBootstrapButtons = Swal.mixin({
@@ -277,14 +276,14 @@
                 'success'
                 )
                 var product_id = $(this).data("id");
-                
+
                 $.ajax({
                     type: "DELETE",
                     url: "{{ route('employee.store') }}"+'/'+product_id,
                     success: function (data) {
                         table.draw();
                     },
-            
+
                     error: function (data) {
                         console.log('Error:', data);
                     }
@@ -303,11 +302,11 @@
             })
 
 
-       
+
       });
-        
+
        //   Render DataTable
-  
+
       var table = $('.data-table').DataTable({
           processing: true,
           serverSide: true,
@@ -324,8 +323,8 @@
               @endcan
           ]
       });
-  
-  
+
+
       function printErrorMsg (msg) {
           $.each( msg, function( key, value ) {
             $('.'+key+'_err').text(value);
@@ -337,8 +336,8 @@
         $('.lname_err').text('');
         $('.company_err').text('');
       }
-         
+
     });
-    
+
   </script>
   @endpush

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Employee;
-use Illuminate\Http\Request; 
+use Illuminate\Http\Request;
 use DataTables;
 use App\Models\Company;
 use Illuminate\Support\Facades\Validator;
@@ -25,7 +25,7 @@ class EmployeeController extends Controller
      */
     public function index(Request $request)
     {
-     
+
         if ($request->ajax()) {
             $data = Employee::latest()->with('company')->get();
             return Datatables::of($data)
@@ -36,7 +36,7 @@ class EmployeeController extends Controller
             ->addColumn('action', function($row){
                     // @can('list_company')
                     $btn = '';
-                    if(auth()->user()->hasPermissionTo('edit_employee')) { 
+                    if(auth()->user()->hasPermissionTo('edit_employee')) {
 
                         $btn = '<a href="javascript:void(0)" data-toggle="tooltip"  data-id="'.$row->id.'" data-original-title="Edit" class="edit btn btn-primary btn-sm editProduct">Edit</a>';
                     }
@@ -55,7 +55,7 @@ class EmployeeController extends Controller
         }
 
         $companies = Company::all();
-        
+
         return view('employee.index',compact('companies'));
     }
 
@@ -66,7 +66,7 @@ class EmployeeController extends Controller
      */
     public function create($id)
     {
-        
+
         Company::select($id->name)->get();
             return response()->json([
                 'status' =>'200',
@@ -85,30 +85,35 @@ class EmployeeController extends Controller
         $validator = Validator::make($request->all(), [
             'fname' => 'required',
             'lname' => 'required',
-            'company'=>'required',
+            'company_id'=>'required',
             'email'=> 'nullable|email',
             'phone' => 'nullable|numeric|digits:11'
-            
-        ]);
+
+        ],
+        [
+            'company_id.required' => 'Company field is required.'
+        ]
+
+    );
         if($validator->fails())
         {
             return response()->json([
                 'status'=>402,
                 'errors'=>$validator->messages(),
             ]);
-        } 
+        }
         try {
             Employee::create($request->all());
             return response()->json([
                 'status' =>'200',
                 'message' => 'Data Added sucessfully'
-            ]); 
+            ]);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => $e->getMessage()
-            ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR); 
+            ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
-              
+
     }
 
     /**
@@ -142,7 +147,7 @@ class EmployeeController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
-    {  
+    {
         $validator = Validator::make($request->all(), [
             'fname' => 'required',
             'lname' => 'required'
@@ -153,21 +158,21 @@ class EmployeeController extends Controller
                 'status'=>400,
                 'errors'=>$validator->messages(),
             ]);
-        } 
+        }
         try {
             $employee = Employee::find($id);
             $employee->update($request->all());
             return response()->json([
                 'status' =>'200',
                 'message' => 'Data Updated sucessfully'
-            ]);   
+            ]);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => $e->getMessage()
-            ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR); 
+            ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-           
+
 
     }
 
@@ -180,7 +185,7 @@ class EmployeeController extends Controller
     public function destroy($id)
     {
         Employee::find($id)->delete();
-      
+
         return response()->json(['success'=>'Product deleted successfully.']);
     }
 }
