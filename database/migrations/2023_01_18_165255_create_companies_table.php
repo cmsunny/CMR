@@ -10,7 +10,7 @@ class CreateCompaniesTable extends Migration
      * Run the migrations.
      *
      * @return void
-     */ 
+     */
     public function up()
     {
         Schema::create('companies', function (Blueprint $table) {
@@ -19,8 +19,9 @@ class CreateCompaniesTable extends Migration
             $table->string('email');
             $table->string('image')->nullable();
             $table->string('website')->nullable();
+            $table->softDeletes();
             $table->timestamps();
-        }); 
+        });
     }
 
     /**
@@ -31,5 +32,8 @@ class CreateCompaniesTable extends Migration
     public function down()
     {
         Schema::dropIfExists('companies');
+        Schema::table('posts', function(Blueprint $table){
+            $table->dropSoftDeletes();
+        });
     }
 }

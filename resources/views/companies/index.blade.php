@@ -3,29 +3,51 @@
 @section('content')
 
 <div class="nk-block nk-block-lg">
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Companies</h1>
-    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalDefault" id="createNewProduct">Add Data</button>
-</div>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Companies</h1>
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalDefault" id="createNewProduct">Add Data</button>
+    </div>
+
+    {{-- <div class="card-header">
+        <div class="row">
+            <div class="col col-md-6"></div>
+            <div class="col col-md-6 text-right">
+                @if(request()->has('view_deleted'))
+
+                <a href="{{ route('company.index') }}" class="btn btn-info btn-sm">View All Post</a>
+
+                <a href="{{ route('company.restore_all') }}" class="btn btn-success btn-sm">Restore All</a>
+
+                @else
+
+                <a href="{{ route('company.index', ['view_deleted' => 'DeletedRecords']) }}" class="btn btn-dark active btn-sm ">Delete Record</a>
+
+                @endif
+
+            </div>
+        </div>
+    </div> --}}
+
+
     <div class="card card-preview">
         <div class="card-inner table-responsive">
-    <table class=" nowrap table dataTable no-footer dtr-inline"  id="data-table">
-        <thead>
-            <tr>
-                <th>No</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Logo</th>
-                <th>Website</th>
-                <th>Action</th>
+            <table class=" nowrap table dataTable no-footer dtr-inline"  id="data-table">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Logo</th>
+                        <th>Website</th>
+                        <th>Action</th>
 
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
-</div>
-</div>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 <div class="modal fade" tabindex="-1" id="ajaxModel" style="display: none;" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -60,7 +82,7 @@
                         <label for="image" class="col-sm-2 control-label">Logo</label>
                         <div class="col-sm-12">
                             <div class="custom-file">
-                                <input type="file" name="image"id='image' class="custom-file-input" id="customFile">
+                                <input type="file" name="image"id='image' class="custom-file-input" id="customFile" accept="image/png, image/gif, image/jpeg" >
                                 <label class="custom-file-label" for="customFile">Choose file</label>
                                 <span class="text-danger error-text image_err"></span>
                             </div>
@@ -90,8 +112,8 @@
 @endsection
 
 @push('scripts')
-<script type="text/javascript">
-  $(function () {
+    <script type="text/javascript">
+         $(function () {
 
         /*------------------------------------------
         --------------------------------------------
@@ -150,9 +172,6 @@
             e.preventDefault();
             var formData = new FormData(this);
             var id = $("#product_id").val()
-            // $('#createNewProduct').click(function(){
-            //    location.reload(true);
-            // })
 
             if(id) {
                 updateCompnay(id,formData);
@@ -162,6 +181,7 @@
             }
 
         }))
+
         function updateCompnay(id, formData)
         {
             resetErrorMessag();
@@ -193,20 +213,16 @@
                     if (result.isConfirmed) {
                         Swal.fire('Saved!', '', 'success')
                         $('#productForm').trigger("reset");
-                         $('#ajaxModel').modal('hide');
-                         table.draw();
+                        $('#ajaxModel').modal('hide');
+                        table.draw();
                     } else if (result.isDenied) {
                         Swal.fire('Changes are not saved', '', 'info')
                     }
                     })
-
-
-
-
                 }
             }
             });
-       }
+        }
 
       function createCompmany(formData)
        {
@@ -252,60 +268,51 @@
     --------------------------------------------
     --------------------------------------------*/
     $('body').on('click', '.deleteProduct', function () {
-         const swalWithBootstrapButtons = Swal.mixin({
-            customClass: {
-                confirmButton: 'btn btn-success',
-                cancelButton: 'btn btn-danger'
-            },
-            buttonsStyling: false
-            })
+        const swalWithBootstrapButtons = Swal.mixin({
+        customClass: {
+            confirmButton: 'btn btn-success',
+            cancelButton: 'btn btn-danger'
+        },
+        buttonsStyling: false
+        })
+        swalWithBootstrapButtons.fire({
+        title: 'Are you sure?',
+        text: "You want to delete it !",
+        icon: 'warning',
+        showCancelButton: true,
+        cancelButtonText: 'No, cancel!',
+        confirmButtonText: 'Yes, delete it!',
+        reverseButtons: true
+        }).then((result) => {
+        if (result.isConfirmed) {
+            swalWithBootstrapButtons.fire(
+            'Deleted!',
+            'Your file has been deleted.',
+            'success'
+            )
+            var product_id = $(this).data("id");
+            $.ajax({
+                type: "DELETE",
+                url: "{{ route('company.store') }}"+'/'+product_id,
+                success: function (data) {
+                    table.draw();
+                },
+                error: function (data) {
+                    console.log('Error:', data);
+                }
+            });
 
-            swalWithBootstrapButtons.fire({
-            title: 'Are you sure?',
-            text: "You want to delete it !",
-            icon: 'warning',
-            showCancelButton: true,
-            cancelButtonText: 'No, cancel!',
-            confirmButtonText: 'Yes, delete it!',
-            reverseButtons: true
-            }).then((result) => {
-            if (result.isConfirmed) {
-                swalWithBootstrapButtons.fire(
-                'Deleted!',
-                'Your file has been deleted.',
-                'success'
-                )
-                var product_id = $(this).data("id");
-
-                $.ajax({
-                    type: "DELETE",
-                    url: "{{ route('company.store') }}"+'/'+product_id,
-                    success: function (data) {
-                        table.draw();
-                    },
-                    error: function (data) {
-                        console.log('Error:', data);
-                    }
-                });
-
-            } else if (
-                /* Read more about handling dismissals below */
-                result.dismiss === Swal.DismissReason.cancel
-            ) {
-                swalWithBootstrapButtons.fire(
-                'Cancelled',
-                'Your Data is safe :)',
-                'error'
-                )
-            }
-            })
-
-
-
-
-
-
+        } else if (result.dismiss === Swal.DismissReason.cancel)
+        {
+            swalWithBootstrapButtons.fire(
+            'Cancelled',
+            'Your Data is safe :)',
+            'error'
+            )
+        }
+        })
     });
+
       /*------------------------------------------
     --------------------------------------------
     Render DataTable
@@ -333,15 +340,13 @@
         }
         // Reset Error
         function resetErrorMessag() {
-        $('.name_err').text('');
-        $('.email_err').text('');
-        $('.image_err').text('');
-        $('.website_err').text('');
-      }
+            $('.name_err').text('');
+            $('.email_err').text('');
+            $('.image_err').text('');
+            $('.website_err').text('');
+        }
 
     });
-
-
 
 </script>
 @endpush

@@ -67,11 +67,6 @@ class EmployeeController extends Controller
     public function create($id)
     {
 
-        Company::select($id->name)->get();
-            return response()->json([
-                'status' =>'200',
-                'message' => 'Data Added sucessfully'
-            ]);
     }
 
     /**
@@ -87,7 +82,7 @@ class EmployeeController extends Controller
             'lname' => 'required',
             'company_id'=>'required',
             'email'=> 'nullable|email',
-            'phone' => 'nullable|numeric|digits:11'
+            'phone' => 'numeric|digits:11'
 
         ],
         [
@@ -135,8 +130,9 @@ class EmployeeController extends Controller
      */
     public function edit($id)
     {
-        $employee = Employee::find($id);
+        $employee = Employee::with('company')->find($id);
         return response()->json($employee);
+
     }
 
     /**

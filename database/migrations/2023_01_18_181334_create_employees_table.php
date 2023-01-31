@@ -20,6 +20,7 @@ class CreateEmployeesTable extends Migration
             $table->unsignedBigInteger('company_id')->nullable();
             $table->string('email')->nullable();
             $table->text('phone')->nullable();
+            $table->softDeletes();
             $table->timestamps();
 
             $table->foreign('company_id')->references('id')->on('companies');
@@ -34,5 +35,8 @@ class CreateEmployeesTable extends Migration
     public function down()
     {
         Schema::dropIfExists('employees');
+        Schema::table('posts', function(Blueprint $table){
+            $table->dropSoftDeletes();
+        });
     }
 }

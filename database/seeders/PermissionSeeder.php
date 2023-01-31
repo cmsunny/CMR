@@ -14,44 +14,55 @@ class PermissionSeeder extends Seeder
      */
     public function run()
     {
-        $permissions = [ 
+        $permissions = [
             [
                'name' => 'list_employee',
                'guard_name' => 'web',
+               'group'=>'employee',
             ],
             [
                 'name' => 'create_employee',
                 'guard_name' => 'web',
+                'group'=>'employee',
             ],
             [
                 'name' => 'edit_employee',
                 'guard_name' => 'web',
+                'group'=>'employee',
             ],
             [
                 'name' => 'delete_employee',
                 'guard_name' => 'web',
+                'group'=>'employee',
             ],
             [
                 'name' => 'list_company',
                 'guard_name' => 'web',
+                'group'=>'company',
             ],
             [
                 'name' => 'create_company',
                 'guard_name' => 'web',
+                'group'=>'company',
             ],
             [
                 'name' => 'edit_company',
                 'guard_name' => 'web',
+                'group'=>'company',
             ],
             [
                 'name' => 'delete_company',
                 'guard_name' => 'web',
+                'group'=>'company',
             ]
-           
+
         ];
-        Permission::insert($permissions);
-    
+      foreach($permissions as $permission){
+            Permission::create($permission);
+      }
+
         $admin = Role::create([ 'name'=> 'admin' ]);
+
         $adminPermissions = Permission::get();
         $admin->permissions()->sync($adminPermissions);
         $subAdmin = Role::create([ 'name'=> 'subadmin' ]);

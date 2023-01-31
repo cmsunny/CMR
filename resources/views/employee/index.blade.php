@@ -8,26 +8,45 @@
         {{-- <button type="button" class="btn btn-primary" href="javascript:void(0)" data-toggle="modal" data-target="#modalDefault" id="createNewProduct">Add Data</button> --}}
         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalDefault" id="createNewProduct">Add Data</button>
     </div>
-    <div class="card card-preview">
-    <div class="card-inner">
- <table class=" data-table nowrap table dataTable no-footer  collapsed" >
-  <thead>
-     <tr>
-        <th>No</th>
-        <th>First Name</th>
-        <th>Last Name</th>
-        <th>Company</th>
-        <th>Email</th>
-        <th>Phone</th>
-        @can('edit_employee','delete_employee')
-            <th>Action</th>
-        @endcan
+    {{-- <div class="card-header">
+        <div class="row">
+            <div class="col col-md-6"></div>
+            <div class="col col-md-6 text-right">
+                @if(request()->has('view_deleted'))
 
-     </tr>
-  </thead>
- </table>
-</div>
-</div>
+                <a href="{{ route('employee.index') }}" class="btn btn-info btn-sm">View All Post</a>
+
+                <a href="{{ route('employee.restore_all') }}" class="btn btn-success btn-sm">Restore All</a>
+
+                @else
+
+                <a href="{{ route('employee.index', ['view_deleted' => 'DeletedRecords']) }}" class="btn btn-dark active btn-sm ">Delete Record</a>
+
+                @endif
+
+            </div>
+        </div>
+    </div> --}}
+
+    <div class="card card-preview">
+        <div class="card-inner table-responsive">
+            <table class=" data-table nowrap table dataTable no-footer  collapsed" >
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Company</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        @can('edit_employee','delete_employee')
+                            <th>Action</th>
+                        @endcan
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
 
 {{-- Modal --}}
 <div class="modal fade" tabindex="-1" id="ajaxModel" tabindex="-1">
@@ -59,12 +78,16 @@
                     <div class="form-group">
                         <label for="company" class="col-sm-2 control-label">Company</label>
                         <div class="col-sm-12">
-                            <select id="company" class="form-control" name="company_id" placeholder="Enter company Name" value="">
-
-                                <option value="">Select Company</option>
+                            <select id="company_id" class="form-select" data-search="on" name="company_id" >
+                                <option value="default_option" >Select Companies </option>
                                 @foreach ($companies as $company)
-                                <option value="{{$company->id}}" id="option">{{$company->name}}</option>
+                                    <option value="{{$company->id}}">{{$company->name}}</option>
                                 @endforeach
+{{--
+                                    @foreach($users as $user)
+                                        <option value="{{ $user->id }}" {{ $user->id == $order->user_id ? 'selected' : '' }}>{{ $user->name }}</option>
+                                    @endforeach --}}
+
                               </select>
                             <span class="text-danger error-text company_id_err"></span>
                         </div>
@@ -91,7 +114,6 @@
                     </div>
                 </form>
             </div>
-
         </div>
     </div>
 </div>
@@ -101,157 +123,132 @@
 <script type="text/javascript">
     $(function () {
 
+        //   Pass Header Token
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
 
-            //   Pass Header Token
-
-          $.ajaxSetup({
-              headers: {
-                  'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-              }
-          });
+        $('#company_id').select2({
+            dropdownParent: $("#ajaxModel")
+        });
 
 
 
-
-            //   Click to Button
-
-          $('#createNewProduct').click(function () {
-              $('#saveBtn').val("create-product");
-              $('#product_id').val('');
-              $('#productForm').trigger("reset");
-              $('#modelHeading').html("Create New Data");
-              $('#ajaxModel').modal('show');
-              resetErrorMessag();
-          });
-
+        //   Click to Button
+        $('#createNewProduct').click(function () {
+            $('#saveBtn').val("create-product");
+            $('#product_id').val('');
+            $('#productForm').trigger("reset");
+            $('#modelHeading').html("Create New Data");
+            $("#company_id").val('default_option').trigger("change");
+            $('#ajaxModel').modal('show');
+            resetErrorMessag();
+        });
 
            //   Click to Edit Button
-
           $('body').on('click', '.editProduct', function () {
-          var product_id = $(this).data('id');
-
-              $.get("{{ route('employee.index') }}" +'/' + product_id +'/edit', function (data) {
-                  $('#modelHeading').html("Edit Employee");
-                  $('#saveBtn').val("edit-user");
-                  $('#ajaxModel').modal('show');
-                  $('#product_id').val(data.id);
-                  $('#fname').val(data.fname);
-                  $('#lname').val(data.lname);
-                  $('#company').val(data.company_id);
-                  $('#email').val(data.email);
-                  $('#phone').val(data.phone);
-                  resetErrorMessag();
-              });
+            var product_id = $(this).data('id');
+            $.get("{{ route('employee.index') }}" +'/' + product_id +'/edit', function (data) {
+                $('#modelHeading').html("Edit Employee");
+                $('#saveBtn').val("edit-user");
+                $('#ajaxModel').modal('show');
+                $('#product_id').val(data.id);
+                $('#fname').val(data.fname);
+                $('#lname').val(data.lname);
+                $('#company_id').val(data.company_id);
+                $('#company_id').trigger('change')
+                $('#email').val(data.email);
+                $('#phone').val(data.phone);
+                resetErrorMessag();
+            });
           });
 
-
-        //   $('.editProduct').click(function(e){
-        //     e.preventDefault();
-        //     console.log('edit button');
-        //     $('.fname_err').text('');
-        //     $('.lname_err').text('');
-        //     $('.company_err').text('');
-        //   })
-
-
             //   Create Product Code
-
           $('#saveBtn').click(function (e) {
               e.preventDefault();
               $(this).html('Save');
               var id = $("#product_id").val()
               if(id) {
-                  updateCompnay(id);
+
+                updateCompnay(id);
+
               } else {
                   createCompmany();
               }
           });
 
-
+          // Update Function
           function updateCompnay(id)
            {
-              resetErrorMessag();
-              var url = '{{ route("employee.update", ":id") }}';
-              url = url.replace(':id', id);
-
-              $.ajax({
-              data: $('#productForm').serialize(),
-              url: url,
-              type: "PUT",
-              dataType: 'json',
-              success: function (data) {
-                  if(data.status == '402')
-                  {
-                      printErrorMsg(data.errors);
-                  }
-                  if(data.status == '200')
-                  {
-
-                    Swal.fire({
+            resetErrorMessag();
+            var url = '{{ route("employee.update", ":id") }}';
+            url = url.replace(':id', id);
+            $.ajax({
+            data: $('#productForm').serialize(),
+            url: url,
+            type: "PUT",
+            dataType: 'json',
+            success: function (data) {
+                if(data.status == '402'){
+                    printErrorMsg(data.errors);
+                }
+                if(data.status == '200'){
+                Swal.fire({
                     title: 'Do you want to save the changes?',
                     showDenyButton: true,
                     showCancelButton: true,
                     confirmButtonText: 'Save',
                     denyButtonText: `Don't save`,
                     }).then((result) => {
-                    /* Read more about isConfirmed, isDenied below */
-                    if (result.isConfirmed) {
-                        Swal.fire('Saved!', '', 'success')
-                        $('#productForm').trigger("reset");
-                        $('#ajaxModel').modal('hide');
-                        table.draw();
-                    } else if (result.isDenied) {
-                        Swal.fire('Changes are not saved', '', 'info')
-                    }
+                        if (result.isConfirmed) {
+                            Swal.fire('Saved!', '', 'success')
+                            $('#productForm').trigger("reset");
+                            $('#ajaxModel').modal('hide');
+                            table.draw();
+                        } else if (result.isDenied) {
+                            Swal.fire('Changes are not saved', '', 'info')
+                        }
                     })
-
-
-                  }
-              }
-              });
-         }
-
-         function createCompmany()
-           {
-                resetErrorMessag();
-                var url = '{{ route("employee.store") }}';
-
-                  $.ajax({
-                  data: $('#productForm').serialize(),
-                  url: url,
-                  type: "POST",
-                  dataType: 'json',
-                  success: function (data) {
-                      // console.log(data);
-                      if(data.status == '402')
-                      {
-                          printErrorMsg(data.errors);
-                      }
-                      if(data.status == '200')
-                      {
-
+                }
+                }
+            });
+           }
+           // Create Function
+        function createCompmany()
+        {
+            resetErrorMessag();
+            var url = '{{ route("employee.store") }}';
+            $.ajax({
+                data: $('#productForm').serialize(),
+                url: url,
+                type: "POST",
+                dataType: 'json',
+                success: function (data) {
+                    // console.log(data);
+                    if(data.status == '402'){
+                        printErrorMsg(data.errors);
+                    }
+                    if(data.status == '200'){
                         Swal.fire({
-                        position: 'top-center',
-                        icon: 'success',
-                        title: data.message,
-                        showConfirmButton: false,
-                        timer: 1500
+                            position: 'top-center',
+                            icon: 'success',
+                            title: data.message,
+                            showConfirmButton: false,
+                            timer: 1500
                         })
-                      $('#productForm').trigger("reset");
-                      $('#ajaxModel').modal('hide');
-                      table.draw();
-                      }
-
-                  }
-             });
+                    $('#productForm').trigger("reset");
+                    $('#ajaxModel').modal('hide');
+                    table.draw();
+                    }
+                }
+            });
         };
-
-
 
         //   Delete Product Code
 
       $('body').on('click', '.deleteProduct', function () {
-
         const swalWithBootstrapButtons = Swal.mixin({
             customClass: {
                 confirmButton: 'btn btn-success',
@@ -259,7 +256,6 @@
             },
             buttonsStyling: false
             })
-
             swalWithBootstrapButtons.fire({
             title: 'Are you sure?',
             text: "You want to delete it !",
@@ -276,33 +272,23 @@
                 'success'
                 )
                 var product_id = $(this).data("id");
-
                 $.ajax({
                     type: "DELETE",
                     url: "{{ route('employee.store') }}"+'/'+product_id,
                     success: function (data) {
                         table.draw();
                     },
-
                     error: function (data) {
                         console.log('Error:', data);
                     }
                 });
-
-            } else if (
-                /* Read more about handling dismissals below */
-                result.dismiss === Swal.DismissReason.cancel
-            ) {
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
                 swalWithBootstrapButtons.fire(
                 'Cancelled',
                 'Your Data is safe :)',
-                'error'
-                )
-            }
+                'error')
+                 }
             })
-
-
-
       });
 
        //   Render DataTable
@@ -335,6 +321,8 @@
         $('.fname_err').text('');
         $('.lname_err').text('');
         $('.company_err').text('');
+        $('.email_err').text('');
+        $('.phone_err').text('');
       }
 
     });

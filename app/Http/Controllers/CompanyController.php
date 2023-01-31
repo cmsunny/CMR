@@ -26,10 +26,11 @@ class CompanyController extends Controller
      */
     public function index(Request $request)
     {
-     
+
         if ($request->ajax()) {
             $data = Company::all();
-  
+
+
             return Datatables::of($data)
             ->addIndexColumn()
             ->addColumn('action', function($row){
@@ -41,12 +42,12 @@ class CompanyController extends Controller
                     return $btn;
             })->addColumn('image',function($row){
                 $src = asset('storage/'.$row->image);
-                return '<img src=" '.$src.'" border="0" width="40" height="40px" class="img-rounded" align="center" />';
+                return '<img src=" '.$src.'" border="2" width="30px" height="30px" class="img-rounded" align="center" />';
             })
             ->rawColumns(['action','image'])
             ->make(true);
         }
-        
+
         return view('companies.index');
     }
 
@@ -72,7 +73,7 @@ class CompanyController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'email' => 'required|email|unique:companies',
-            'image' => 'required',
+            'image' => 'required|mimes:png,jpg,jpeg|max:2048',
             'website' => 'required|url'
         ]);
         if($validator->fails())
@@ -81,7 +82,7 @@ class CompanyController extends Controller
                 'status'=>402,
                 'errors'=>$validator->messages(),
             ]);
-        } 
+        }
         try {
             $data = $request->except('image');
             if($request->hasFile('image')){
@@ -95,9 +96,9 @@ class CompanyController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'message' => $e->getMessage()
-            ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR); 
+            ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
-       
+
     }
 
     /**
@@ -131,7 +132,7 @@ class CompanyController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
-    {  
+    {
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'email' => ['required', 'email',
@@ -145,7 +146,7 @@ class CompanyController extends Controller
                 'status'=>402,
                 'errors'=>$validator->messages(),
             ]);
-        } 
+        }
         try {
             $data = $request->except(['_token','_method','image']);
             $company = Company::findOrfail($id);
@@ -160,12 +161,12 @@ class CompanyController extends Controller
             return response()->json([
                 'status' =>'200',
                 'message' => 'Data Updated sucessfully'
-            ]); 
+            ]);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => $e->getMessage()
             ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
-        }    
+        }
 
     }
 
@@ -178,9 +179,9 @@ class CompanyController extends Controller
     public function destroy($id)
     {
         Company::find($id)->delete();
-     
+
         return response()->json(['success'=>'Company deleted successfully.']);
     }
 
-   
+
 }
