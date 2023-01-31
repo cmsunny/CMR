@@ -73,6 +73,7 @@
                         <div class="col-sm-12">
                             <input type="text" class="form-control" id="lname" name="lname" placeholder="Enter LastName" value="" maxlength="50">
                             <span class="text-danger error-text lname_err"></span>
+                            <div></div>
                         </div>
                     </div>
                     <div class="form-group">
