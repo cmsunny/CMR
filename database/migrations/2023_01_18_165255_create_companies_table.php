@@ -34,6 +34,7 @@ class CreateCompaniesTable extends Migration
         Schema::dropIfExists('companies');
         Schema::table('posts', function(Blueprint $table){
             $table->dropSoftDeletes();
+
         });
     }
 }

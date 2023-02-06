@@ -1,10 +1,12 @@
 <?php
 
 namespace App\Http\Controllers;
-
-use App\Models\Role;
-use App\User;
+use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
+use Spatie\Permission\Models\Permission;
+use Illuminate\Http\JsonResponse;
+use DataTables;
 
 class RoleController extends Controller
 {
@@ -16,7 +18,7 @@ class RoleController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = Role::all();
+            $data = Role::where('name', '!=', 'admin')->get();
 
 
             return Datatables::of($data)
@@ -43,8 +45,12 @@ class RoleController extends Controller
      */
     public function create()
     {
-        $permissions=Pemission::all();
-        return view('Roles.index', compact('permissions'));
+        $permissions = Permission::all();
+        return response()->json([
+          'status' => '200',
+          'permissions' => $permissions
+        ]);
+
     }
 
     /**
@@ -55,17 +61,35 @@ class RoleController extends Controller
      */
     public function store(Request $request)
     {
-        $permissions  = Permission::all();
 
-        if($request->permissions) {
-            $permissions = collect($request->permissions)->merge($permissions);
+
+        // dd($request->all());
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|unique:roles',
+        ]);
+        if($validator->fails())
+        {
+            return response()->json([
+                'status'=>'402',
+                'errors'=>$validator->messages(),
+            ]);
         }
-        permissions()->sync($permissions);
 
-        return response()->json([
-            'success' => JsonResponse::HTTP_OK,
-            'message' => 'Role added successfully.',
-        ], JsonResponse::HTTP_OK);
+        try {
+            $new_role = Role::create([
+                'name' => $request->name,
+                'title' => $request->title,
+            ]);
+            $new_role->permissions()->sync($request->permission);
+            return response()->json([
+               'status' =>'200',
+               'message' => 'Data Added sucessfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
@@ -85,9 +109,23 @@ class RoleController extends Controller
      * @param  \App\Models\Role  $role
      * @return \Illuminate\Http\Response
      */
-    public function edit(Role $role)
+    public function edit($id)
     {
-        //
+        try{
+        $role = Role::with('permissions')->get()->find($id);
+        $permissions = Permission::all();
+            // dd($role);
+        return response()->json([
+            'status' => JsonResponse::HTTP_OK,
+            'data' => $role,
+            'permissions'=> $permissions,
+        ], JsonResponse::HTTP_OK);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => JsonResponse::HTTP_INTERNAL_SERVER_ERROR,
+            'message' => $e->getMessage()
+        ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+    }
     }
 
     /**
@@ -97,9 +135,38 @@ class RoleController extends Controller
      * @param  \App\Models\Role  $role
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Role $role)
-    {
-        //
+    public function update(Request $request, $id)
+     {
+
+
+        // dd($request->all());
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+        ]);
+        if($validator->fails())
+        {
+            return response()->json([
+                'status'=>'402',
+                'errors'=>$validator->messages(),
+            ]);
+        }
+
+        try {
+            $role = Role::find($id);
+
+            $role->update($request->all());
+            $role->syncPermissions($request->permission);
+            return response()->json([
+               'status' =>'200',
+               'data' => $role,
+            //    'permissions'=> $permissions,
+               'message' => 'Data Added sucessfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
@@ -108,9 +175,16 @@ class RoleController extends Controller
      * @param  \App\Models\Role  $role
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Role $role, $id)
+    public function destroy($id)
     {
-        Role::find($id)->delete();
-        return response()->json(['success'=>'Company deleted successfully.']);
+        try{
+            $role = Role::find($id);
+            $role->syncPermissions();
+            $role->delete();
+        }catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }

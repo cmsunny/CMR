@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Validator;
 use DataTables;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\File;
 use Illuminate\Http\Request;
 use App\Models\Company;
@@ -32,17 +33,18 @@ class CompanyController extends Controller
 
 
             return Datatables::of($data)
-            ->addIndexColumn()
-            ->addColumn('action', function($row){
+                ->addIndexColumn()
+                ->addColumn('action', function ($row) {
 
-                   $btn = '<a href="javascript:void(0)" data-toggle="tooltip"  data-id="'.$row->id.'" data-original-title="Edit" class="edit btn btn-primary btn-sm editProduct">Edit</a>';
+                    $btn = '<a href="javascript:void(0)" data-toggle="tooltip"  data-id="' . $row->id . '" data-original-title="Edit" class="edit btn btn-primary btn-sm editProduct">Edit</a>';
 
-                   $btn = $btn.' <a href="javascript:void(0)" data-toggle="tooltip"  data-id="'.$row->id.'" data-original-title="Delete" class="btn btn-danger btn-sm deleteProduct">Delete</a>';
+                    $btn = $btn . ' <a href="javascript:void(0)" data-toggle="tooltip"  data-id="' . $row->id . '" data-original-title="Delete" class="btn btn-danger btn-sm deleteProduct">Delete</a>';
 
                     return $btn;
-            })->addColumn('image',function($row){
-                $src = asset('storage/'.$row->image);
-                return '<img src=" '.$src.'" border="2" width="30px" height="30px" class="img-rounded" align="center" />';
+                })->addColumn('image', function ($row) {
+                $src = $row->image ? asset('storage/' . $row->image) : asset('assets/images/placeholder.png');
+
+                return '<img src=" '.$src.'" border="2" width="35px" height="50px" class="img-rounded" align="center" />';
             })
             ->rawColumns(['action','image'])
             ->make(true);
@@ -69,12 +71,17 @@ class CompanyController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->all());
+        $width=config('image_size.image.width');
+        $height=config('image_size.image.height');
+        $size=config('image_size.image.size');
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'email' => 'required|email|unique:companies',
-            'image' => 'required|mimes:png,jpg,jpeg|max:2048',
+            'image' => "required|dimensions:width=$width,height:$height|max:$size",
             'website' => 'required|url'
+        ],[
+            'image.dimensions'=>'Image dimensions must be 100 x 200',
+            'image.size'=>'Image Size must be 1024'
         ]);
         if($validator->fails())
         {
@@ -86,7 +93,7 @@ class CompanyController extends Controller
         try {
             $data = $request->except('image');
             if($request->hasFile('image')){
-                $data['image'] = saveResizeImage($request->image, 'images/companies', 550);
+                $data['image'] = saveResizeImage($request->image, 'images/companies', 100);
             }
             Company::create($data);
             return response()->json([
@@ -178,8 +185,15 @@ class CompanyController extends Controller
      */
     public function destroy($id)
     {
-        Company::find($id)->delete();
 
+
+        $company = Company::find($id);
+
+        $company->name = Hash::make($company->name );
+        $company->email = Hash::make($company->email );
+        $company->website = Hash::make($company->website );
+        $company->save();
+        $company->delete();
         return response()->json(['success'=>'Company deleted successfully.']);
     }
 

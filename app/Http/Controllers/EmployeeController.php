@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Employee;
 use Illuminate\Http\Request;
 use DataTables;
+use Illuminate\Support\Facades\Hash;
 use App\Models\Company;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\JsonResponse;
@@ -180,7 +181,13 @@ class EmployeeController extends Controller
      */
     public function destroy($id)
     {
-        Employee::find($id)->delete();
+        $employee=Employee::find($id);
+        $employee->fname=Hash::make( $employee->fname);
+        $employee->lname=Hash::make( $employee->lname);
+        $employee->phone=Hash::make( $employee->phone);
+        $employee->email=Hash::make( $employee->email);
+        $employee->save();
+        $employee->delete();
 
         return response()->json(['success'=>'Product deleted successfully.']);
     }

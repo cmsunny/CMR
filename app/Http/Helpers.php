@@ -49,7 +49,7 @@ function saveResizeImage($file, $directory, $width, $height = null, $type = 'jpg
     $is_preview = strpos($directory, 'previews') !== false;
     $filename = Str::random() . time() . '.' . $type;
     $path = "$directory/$filename";
-    $img = \Image::make($file)->orientate()->encode($type, 80)->resize($width, $height, function ($constraint) use ($height) {
+    $img = \Image::make($file)->orientate()->encode($type, 80)->resize(50, 50, function ($constraint) use ($height) {
         if (!$height) {
             $constraint->aspectRatio();
         }
@@ -105,7 +105,7 @@ function convertTime($time, $format)
  */
 function convertDate($date, $format)
 {
-    
+
     if ($date !== null) {
         return Carbon::parse($date)->format($format);
     }
@@ -259,7 +259,7 @@ function timeFormat($time, $withDate = true) {
 function checkImageIsBroken($image){
     return true;
     if($image->is_external){
-        $ch = curl_init($image->path);    
+        $ch = curl_init($image->path);
         curl_setopt($ch, CURLOPT_NOBODY, true);
         curl_exec($ch);
         $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);

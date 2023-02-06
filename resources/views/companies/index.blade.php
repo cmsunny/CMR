@@ -82,7 +82,7 @@
                         <label for="image" class="col-sm-2 control-label">Logo</label>
                         <div class="col-sm-12">
                             <div class="custom-file">
-                                <input type="file" name="image"id='image' class="custom-file-input" id="customFile" accept="image/png, image/gif, image/jpeg" >
+                                <input type="file" name="image"id='image' class="custom-file-input" id="customFile" accept=".png, .gif, .jpeg, .jpg">
                                 <label class="custom-file-label" for="customFile">Choose file</label>
                                 <span class="text-danger error-text image_err"></span>
                             </div>
@@ -125,7 +125,6 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
-
 
         /*------------------------------------------
         --------------------------------------------
@@ -243,7 +242,7 @@
                     }
                     if(data.status == '200')
                     {
-                        // $('#saveBtn').refreshPage();
+
                         Swal.fire({
                         position: 'top-center',
                         icon: 'success',
