@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\RoleController;
-use App\Http\Controllers\PermissionsController;
+use App\Http\Controllers\PermissionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,7 +28,7 @@ Route::group([ 'middleware' => 'auth'], function () {
 Route::resource('company', CompanyController::class);
 Route::resource('employee', EmployeeController::class);
 Route::resource('role', RoleController::class);
-Route::resource('permissions', PermissionsController::class);
+Route::resource('permission', PermissionController::class);
 
 });
 require __DIR__.'/auth.php';

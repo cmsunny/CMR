@@ -28,7 +28,7 @@
                         </a>
                     </li>
                     <li class="nk-menu-item">
-                        <a href="{{ route('permissions.index') }}" class="nk-menu-link">
+                        <a href="{{ route('permission.index') }}" class="nk-menu-link">
                             <span class="nk-menu-icon"><em class="icon ni ni-dashlite"></em></span>
                             <span class="nk-menu-text">Permissions</span>
                         </a>

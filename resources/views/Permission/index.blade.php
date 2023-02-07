@@ -4,7 +4,7 @@
 
 <div class="nk-block nk-block-lg">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Roles</h1>
+        <h1>Permission</h1>
         <button type="button" class="btn btn-primary createNewRole" id="NewRole">Add New</button>
     </div>
 
@@ -48,16 +48,10 @@
                     <div class="form-group">
                         <label for="title" class="col-sm-2 control-label">Title</label>
                         <div class="col-sm-12">
-                            <input type="text" class="form-control" id="title" name="title" placeholder="Enter Title" value="" maxlength="50" >
-                            <span class="text-danger error-text email_err"></span>
+                            <input type="text" class="form-control title" id="title" name="title" placeholder="Enter Title" value="" maxlength="50" >
+                            <span class="text-danger error-text title_err"></span>
                         </div>
 
-                    </div>
-
-                    <div class="form-group">
-                        <label for="company" class="col-sm-2 control-label"><strong>Permissions:</strong></label>
-                        <div class="col-sm-12" id="permissions">
-                        </div>
                     </div>
 
                     <div class="col-sm-offset-2 col-sm-10">
@@ -71,8 +65,6 @@
     </div>
 </div>
 @endsection
-
-
 @push('scripts')
 <script type="text/javascript">
     $(function () {
@@ -92,15 +84,15 @@
               $('#saveBtn').val("create-role");
               $('#roleModel_id').val('');
               $('#roleForm').trigger("reset");
-              $('#modelHeading').html("Create New Role");
-              $('#permissions').html('');
+              $('#modelHeading').html("Add New");
               $('#RoleModel').modal('show');
               resetErrorMessag();
         });
 
         $('.createNewRole').click(function(e){
+
             e.preventDefault();
-                var url = '{{ route("role.create") }}';
+                var url = '{{ route("permission.create") }}';
                 $.ajax({
                 url: url,
                 type: "GET",
@@ -108,7 +100,6 @@
                 contentType: false,
                 processData: false,
                 success: function (data) {
-                    permission(data);
                     $("#RoleModel").modal('show');
                     if(data.status == '402')
                     {
@@ -123,35 +114,16 @@
         $('body').on('click', '.editProduct', function () {
         var roleModel_id = $(this).data('id');
                 resetErrorMessag();
-            $.get("{{ route('role.index') }}" +'/' + roleModel_id +'/edit', function (data) {
+            $.get("{{ route('permission.index') }}" +'/' + roleModel_id +'/edit', function (data) {
 
-                $('#modelHeading').html("Edit Role");
+                $('#modelHeading').html("Edit Permissions");
                 $('#saveBtn').val("edit-user");
-                $('#roleModel_id').val(data.data.id);
-                $('#name').val(data.data.name);
-                $('#title').val(data.data.title);
-                $('#permissions').html('');
-                permission(data, data.data.permissions);
+                $('#roleModel_id').val(data.id);
+                $('#name').val(data.name);
+                $('.title').val(data.title);
                 $('#RoleModel').modal('show');
             });
         });
-
-
-        // Permission Function
-
-        function permission(data, assignedPermissions = null){
-            for (let i = 0; i < data.permissions.length; ++i){
-                var className = "checkbox-input";
-                var fullClassName = className + data.permissions[i]['id'];
-                $('#permissions').append('<input type="checkbox"  class="' + fullClassName + '" value="'+data.permissions[i]['id']+'" name="permission[]">  <label for="w" class="text-capitalize">'+data.permissions[i]['name']+' </label> <br>' );
-                if(assignedPermissions){
-                    if(assignedPermissions.find((permission) => permission.id == data.permissions[i]['id'])) {
-                        $('.'+fullClassName).prop('checked', true);
-                    }
-                }
-
-            }
-        }
 
         // MOdal Submit
 
@@ -173,7 +145,7 @@
         {
             resetErrorMessag();
             formData.append('_method', 'PUT');
-            var url = '{{ route("role.update", ":id") }}';
+            var url = '{{ route("permission.update", ":id") }}';
             url = url.replace(':id', id);
             $.ajax({
             data: formData,
@@ -199,6 +171,7 @@
                     }).then((result) => {
                     if (result.isConfirmed) {
                         Swal.fire('Saved!', '', 'success')
+
                         $('#roleForm').trigger("reset");
                         $('#RoleModel').modal('hide');
                         table.draw();
@@ -214,7 +187,8 @@
         // create Role function
             function createCompmany(formData)
             {
-                var url = '{{ route("role.store") }}';
+                resetErrorMessag();
+                var url = '{{ route("permission.store") }}';
                 $.ajax({
                 data:formData,
                 url: url,
@@ -275,7 +249,7 @@
             var roleModel_id = $(this).data("id");
             $.ajax({
                 type: "DELETE",
-                url: "{{ route('role.store') }}"+'/'+roleModel_id,
+                url: "{{ route('permission.store') }}"+'/'+roleModel_id,
                 success: function (data) {
                     table.draw();
                 },
@@ -299,7 +273,7 @@
       var table = $('#data-table').DataTable({
           processing: true,
           serverSide: true,
-          ajax: "{{ route('role.index') }}",
+          ajax: "{{ route('permission.index') }}",
           columns: [
               {data: 'DT_RowIndex', name: 'DT_RowIndex'},
               {data: 'name', name: 'name'},
@@ -318,9 +292,7 @@
         // Reset Error
         function resetErrorMessag() {
             $('.name_err').text('');
-            $('.email_err').text('');
-            $('.image_err').text('');
-            $('.website_err').text('');
+            $('.title_err').text('');
         }
 
     });
