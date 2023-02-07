@@ -109,7 +109,7 @@ class RoleController extends Controller
     public function edit($id)
     {
         try{
-        $role = Role::with('permissions')->get()->find($id);
+        $role = Role::with('permissions')->get()->findOrfail($id);
         $permissions = Permission::all();
             // dd($role);
         return response()->json([
@@ -149,7 +149,7 @@ class RoleController extends Controller
         }
 
         try {
-            $role = Role::find($id);
+            $role = Role::findOrfail($id);
 
             $role->update($request->all());
             $role->syncPermissions($request->permission);
@@ -175,9 +175,13 @@ class RoleController extends Controller
     public function destroy($id)
     {
         try{
-            $role = Role::find($id);
+            $role = Role::findOrfail($id);
             $role->syncPermissions();
             $role->delete();
+            return response()->json([
+                'status' =>JsonResponse::HTTP_OK,
+                'message' => 'Data Added sucessfully'
+            ], JsonResponse::HTTP_OK);
         }catch (\Exception $e) {
             return response()->json([
                 'message' => $e->getMessage()

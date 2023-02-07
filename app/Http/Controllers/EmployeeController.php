@@ -35,21 +35,14 @@ class EmployeeController extends Controller
                 })
             ->addIndexColumn()
             ->addColumn('action', function($row){
-                    // @can('list_company')
                     $btn = '';
                     if(auth()->user()->hasPermissionTo('edit_employee')) {
-
                         $btn = '<a href="javascript:void(0)" data-toggle="tooltip"  data-id="'.$row->id.'" data-original-title="Edit" class="edit btn btn-primary btn-sm editProduct">Edit</a>';
                     }
                     if(auth()->user()->hasPermissionTo('delete_employee')) {
                         $btn = $btn.' <a href="javascript:void(0)" data-toggle="tooltip"  data-id="'.$row->id.'" data-original-title="Delete" class="btn btn-danger btn-sm deleteProduct">Delete</a>';
                     }
-
-                //    $btn = '<a href="javascript:void(0)" data-toggle="tooltip"  data-id="'.$row->id.'" data-original-title="Edit" class="edit btn btn-primary btn-sm editProduct">Edit</a>';
-
-                //    $btn = $btn.' <a href="javascript:void(0)" data-toggle="tooltip"  data-id="'.$row->id.'" data-original-title="Delete" class="btn btn-danger btn-sm deleteProduct">Delete</a>';
-
-                    return $btn;
+            return $btn;
             })
             ->rawColumns(['action'])
             ->make(true);
@@ -101,9 +94,9 @@ class EmployeeController extends Controller
         try {
             Employee::create($request->all());
             return response()->json([
-                'status' =>'200',
+                'status' =>JsonResponse::HTTP_OK,
                 'message' => 'Data Added sucessfully'
-            ]);
+            ], JsonResponse::HTTP_OK);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => $e->getMessage()
@@ -131,7 +124,7 @@ class EmployeeController extends Controller
      */
     public function edit($id)
     {
-        $employee = Employee::with('company')->find($id);
+        $employee = Employee::with('company')->findOrfail($id);
         return response()->json($employee);
 
     }
@@ -157,12 +150,12 @@ class EmployeeController extends Controller
             ]);
         }
         try {
-            $employee = Employee::find($id);
+            $employee = Employee::findOrfail($id);
             $employee->update($request->all());
             return response()->json([
-                'status' =>'200',
+                'status' =>JsonResponse::HTTP_OK,
                 'message' => 'Data Updated sucessfully'
-            ]);
+            ], JsonResponse::HTTP_OK);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => $e->getMessage()
@@ -181,14 +174,24 @@ class EmployeeController extends Controller
      */
     public function destroy($id)
     {
-        $employee=Employee::find($id);
-        $employee->fname=Hash::make( $employee->fname);
-        $employee->lname=Hash::make( $employee->lname);
-        $employee->phone=Hash::make( $employee->phone);
-        $employee->email=Hash::make( $employee->email);
-        $employee->save();
-        $employee->delete();
+        try {
+            $employee = Employee::find($id);
+            $employee->fname = Hash::make($employee->fname);
+            $employee->lname = Hash::make($employee->lname);
+            $employee->phone = Hash::make($employee->phone);
+            $employee->email = Hash::make($employee->email);
+            $employee->save();
+            $employee->delete();
 
-        return response()->json(['success'=>'Product deleted successfully.']);
+            return response()->json([
+                'status' => JsonResponse::HTTP_OK,
+                'message' => 'Data Added sucessfully'
+            ], JsonResponse::HTTP_OK);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }

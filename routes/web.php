@@ -28,7 +28,7 @@ Route::group([ 'middleware' => 'auth'], function () {
 Route::resource('company', CompanyController::class);
 Route::resource('employee', EmployeeController::class);
 Route::resource('role', RoleController::class);
-Route::resource('permission', PermissionController::class);
+Route::resource('permissions', PermissionController::class);
 
 });
 require __DIR__.'/auth.php';

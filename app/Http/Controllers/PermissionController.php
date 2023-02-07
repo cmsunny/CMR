@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Validator;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Http\JsonResponse;
@@ -19,17 +18,15 @@ class PermissionController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-         $data = Permission::all();
-
+            $data = Permission::all();
             return Datatables::of($data)
             ->addIndexColumn()
             ->addColumn('action', function($row){
 
-                   $btn = '<a href="javascript:void(0)" data-toggle="tooltip"  data-id="'.$row->id.'" data-original-title="Edit" class="edit btn btn-info active btn-sm editProduct">Edit</a>';
+                $btn = '<a href="javascript:void(0)" data-toggle="tooltip"  data-id="'.$row->id.'" data-original-title="Edit" class="edit btn btn-info active btn-sm editProduct">Edit</a>';
+                $btn = $btn.' <a href="javascript:void(0)" data-toggle="tooltip"  data-id="'.$row->id.'" data-original-title="Delete" class="btn btn-warning active btn-sm deleteProduct">Delete</a>';
 
-                   $btn = $btn.' <a href="javascript:void(0)" data-toggle="tooltip"  data-id="'.$row->id.'" data-original-title="Delete" class="btn btn-warning active btn-sm deleteProduct">Delete</a>';
-
-                    return $btn;
+                return $btn;
             })
             ->rawColumns(['action'])
             ->make(true);
@@ -61,7 +58,7 @@ class PermissionController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->all());
+
         $validator = Validator::make($request->all(), [
             'name' => 'required',
 
@@ -73,14 +70,12 @@ class PermissionController extends Controller
                 'errors'=>$validator->messages(),
             ]);
         }
-        // $request->merge(['name' => str_replace(' ', '_', $request->input('name'))]);
         try {
              Permission::create([
                 'name' =>  str_replace(' ', '_', $request->input('name')),
                 'title' => $request->title,
             ]);
-            // dd($new_role);
-            // $new_role->permissions()->sync($request->permission);
+
             return response()->json([
                'status' =>'200',
                'message' => 'Data Added sucessfully'
@@ -111,7 +106,7 @@ class PermissionController extends Controller
      */
     public function edit($id)
     {
-        $permission = Permission::find($id);
+        $permission = Permission::findOrfail($id);
         return response()->json($permission);
     }
 
@@ -124,12 +119,8 @@ class PermissionController extends Controller
      */
     public function update(Request $request, $id)
     {
-
-
-        // dd($request->all());
         $validator = Validator::make($request->all(), [
             'name' => 'required|regex:/^\S*$/u',
-
         ], [
             'name.regex' => 'The :attribute field must not contain spaces.'
         ]);
@@ -142,15 +133,15 @@ class PermissionController extends Controller
         }
 
         try {
-            $permission = Permission::find($id);
-
+            $permission = Permission::findOrfail($id);
             $permission->update($request->all());
-            // $role->syncPermissions($request->permission);
+
             return response()->json([
-               'status' =>'200',
+               'status' =>JsonResponse::HTTP_OK,
                'data' => $permission,
                'message' => 'Data Added sucessfully'
-            ]);
+            ], JsonResponse::HTTP_OK);
+
         } catch (\Exception $e) {
             return response()->json([
                 'message' => $e->getMessage()
@@ -167,9 +158,13 @@ class PermissionController extends Controller
     public function destroy($id)
     {
         try{
-            $role = Permission::find($id);
-            // $role->syncPermissions();
+            $role = Permission::findOrfail($id);
             $role->delete();
+            return response()->json([
+                'status' =>JsonResponse::HTTP_OK,
+                'message' => 'Data Added sucessfully'
+             ], JsonResponse::HTTP_OK);
+
         }catch (\Exception $e) {
             return response()->json([
                 'message' => $e->getMessage()

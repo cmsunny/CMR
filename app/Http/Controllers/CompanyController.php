@@ -27,23 +27,19 @@ class CompanyController extends Controller
      */
     public function index(Request $request)
     {
-
         if ($request->ajax()) {
+
             $data = Company::all();
-
-
             return Datatables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
 
                     $btn = '<a href="javascript:void(0)" data-toggle="tooltip"  data-id="' . $row->id . '" data-original-title="Edit" class="edit btn btn-primary btn-sm editProduct">Edit</a>';
-
                     $btn = $btn . ' <a href="javascript:void(0)" data-toggle="tooltip"  data-id="' . $row->id . '" data-original-title="Delete" class="btn btn-danger btn-sm deleteProduct">Delete</a>';
 
                     return $btn;
                 })->addColumn('image', function ($row) {
                 $src = $row->image ? asset('storage/' . $row->image) : asset('assets/images/placeholder.png');
-
                 return '<img src=" '.$src.'" border="2" width="35px" height="50px" class="img-rounded" align="center" />';
             })
             ->rawColumns(['action','image'])
@@ -97,9 +93,9 @@ class CompanyController extends Controller
             }
             Company::create($data);
             return response()->json([
-               'status' =>'200',
+               'status' =>JsonResponse::HTTP_OK,
                'message' => 'Data Added sucessfully'
-            ]);
+            ], JsonResponse::HTTP_OK);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => $e->getMessage()
@@ -127,7 +123,7 @@ class CompanyController extends Controller
      */
     public function edit($id)
     {
-        $company = Company::find($id);
+        $company = Company::findOrfail($id);
         return response()->json($company);
     }
 
@@ -163,12 +159,12 @@ class CompanyController extends Controller
                 }
                 $data['image'] = saveResizeImage($request->image, 'images/companies', 550);
             }
-            $company = Company::find($id);
+            $company = Company::findOrfail($id);
             $company->update($data);
             return response()->json([
-                'status' =>'200',
+                'status' =>JsonResponse::HTTP_OK,
                 'message' => 'Data Updated sucessfully'
-            ]);
+            ], JsonResponse::HTTP_OK);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => $e->getMessage()
@@ -186,15 +182,24 @@ class CompanyController extends Controller
     public function destroy($id)
     {
 
+        try{
+            $company = Company::findOrfail($id);
 
-        $company = Company::find($id);
+            $company->name = Hash::make($company->name );
+            $company->email = Hash::make($company->email );
+            $company->website = Hash::make($company->website );
+            $company->save();
+            $company->delete();
+            return response()->json([
+                'status' =>JsonResponse::HTTP_OK,
+                'message' => 'Data Added sucessfully'
+            ], JsonResponse::HTTP_OK);
 
-        $company->name = Hash::make($company->name );
-        $company->email = Hash::make($company->email );
-        $company->website = Hash::make($company->website );
-        $company->save();
-        $company->delete();
-        return response()->json(['success'=>'Company deleted successfully.']);
+        }catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
 

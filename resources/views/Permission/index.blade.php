@@ -5,7 +5,7 @@
 <div class="nk-block nk-block-lg">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Permission</h1>
-        <button type="button" class="btn btn-primary createNewRole" id="NewRole">Add New</button>
+        <button type="button" class="btn btn-primary createNewPermission" id="NewPermission">Add New</button>
     </div>
 
     <div class="card card-preview">
@@ -25,7 +25,7 @@
         </div>
     </div>
 </div>
-<div class="modal fade" tabindex="-1" id="RoleModel" style="display: none;" aria-hidden="true">
+<div class="modal fade" tabindex="-1" id="PermissionModel" style="display: none;" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -35,8 +35,8 @@
                 </a>
             </div>
             <div class="modal-body">
-                <form enctype="multipart/form-data" id="roleForm" name="roleForm" class="form-horizontal modal_form">
-                   <input type="hidden" name="roleModel_id" id="roleModel_id">
+                <form enctype="multipart/form-data" id="PermissionForm" name="PermissionForm" class="form-horizontal modal_form">
+                   <input type="hidden" name="PermissionModel_id" id="PermissionModel_id">
                     <div class="form-group">
                         <label for="name" class="col-sm-2 control-label">Name</label>
                         <div class="col-sm-12">
@@ -68,39 +68,35 @@
 @push('scripts')
 <script type="text/javascript">
     $(function () {
-
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-    });
-// Select2 function
-    // $('#company_id').select2({
-    //     dropdownParent: $("#RoleModel")
-    // });
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+        });
 
         //   Click to Button
-        $('#NewRole').click(function () {
-              $('#saveBtn').val("create-role");
-              $('#roleModel_id').val('');
-              $('#roleForm').trigger("reset");
+        $('#NewPermission').click(function () {
+              $('#saveBtn').val("create-Permission");
+              $('#PermissionModel_id').val('');
+              $('#PermissionForm').trigger("reset");
               $('#modelHeading').html("Add New");
-              $('#RoleModel').modal('show');
+              $('#PermissionModel').modal('show');
               resetErrorMessag();
         });
 
-        $('.createNewRole').click(function(e){
+        $('.createNewPermission').click(function(e){
 
             e.preventDefault();
-                var url = '{{ route("permission.create") }}';
-                $.ajax({
+            var url = '{{ route("permissions.create") }}';
+            $.ajax({
                 url: url,
                 type: "GET",
                 cache:false,
                 contentType: false,
                 processData: false,
                 success: function (data) {
-                    $("#RoleModel").modal('show');
+                    $("#PermissionModel").modal('show');
+
                     if(data.status == '402')
                     {
                         printErrorMsg(data.errors);
@@ -109,19 +105,19 @@
             });
         })
 
-        // Edit Role
+        // Edit Permission
 
         $('body').on('click', '.editProduct', function () {
-        var roleModel_id = $(this).data('id');
-                resetErrorMessag();
-            $.get("{{ route('permission.index') }}" +'/' + roleModel_id +'/edit', function (data) {
+            var PermissionModel_id = $(this).data('id');
+            resetErrorMessag();
+            $.get("{{ route('permissions.index') }}" +'/' + PermissionModel_id +'/edit', function (data) {
 
                 $('#modelHeading').html("Edit Permissions");
                 $('#saveBtn').val("edit-user");
-                $('#roleModel_id').val(data.id);
+                $('#PermissionModel_id').val(data.id);
                 $('#name').val(data.name);
                 $('.title').val(data.title);
-                $('#RoleModel').modal('show');
+                $('#PermissionModel').modal('show');
             });
         });
 
@@ -130,22 +126,20 @@
         $('.modal_form').on('submit',(function(e) {
             e.preventDefault();
             var formData = new FormData(this);
-            var id = $("#roleModel_id").val();
-
+            var id = $("#PermissionModel_id").val();
             if(id) {
-                updateCompnay(id,formData);
-
+                updateCompnay(id, formData);
             } else {
                 createCompmany(formData);
             }
         }))
 
-        //update Role Function
+        //update Permission Function
         function updateCompnay(id, formData)
         {
             resetErrorMessag();
             formData.append('_method', 'PUT');
-            var url = '{{ route("permission.update", ":id") }}';
+            var url = '{{ route("permissions.update", ":id") }}';
             url = url.replace(':id', id);
             $.ajax({
             data: formData,
@@ -161,7 +155,6 @@
                 }
                 if(data.status == '200')
                 {
-                    // permission(data, data.permissions);
                     Swal.fire({
                     title: 'Do you want to save the changes?',
                     showDenyButton: true,
@@ -171,9 +164,8 @@
                     }).then((result) => {
                     if (result.isConfirmed) {
                         Swal.fire('Saved!', '', 'success')
-
-                        $('#roleForm').trigger("reset");
-                        $('#RoleModel').modal('hide');
+                        $('#PermissionForm').trigger("reset");
+                        $('#PermissionModel').modal('hide');
                         table.draw();
                     } else if (result.isDenied) {
                         Swal.fire('Changes are not saved', '', 'info')
@@ -184,96 +176,91 @@
             });
         }
 
-        // create Role function
-            function createCompmany(formData)
-            {
-                resetErrorMessag();
-                var url = '{{ route("permission.store") }}';
-                $.ajax({
-                data:formData,
-                url: url,
-                type: "POST",
-                cache:false,
-                contentType: false,
-                processData: false,
-                success: function (data) {
-                    if(data.status == '402')
-                    {
-                        printErrorMsg(data.errors);
-                    }
-                    if(data.status == '200')
-                    {
-
-                        Swal.fire({
+        // create Permission function
+        function createCompmany(formData){
+            resetErrorMessag();
+            var url = '{{ route("permissions.store") }}';
+            $.ajax({
+            data:formData,
+            url: url,
+            type: "POST",
+            cache:false,
+            contentType: false,
+            processData: false,
+            success: function (data) {
+                if(data.status == '402')
+                {
+                    printErrorMsg(data.errors);
+                }
+                if(data.status == '200')
+                {
+                    Swal.fire({
                         position: 'top-center',
                         icon: 'success',
                         title: data.message,
                         showConfirmButton: false,
                         timer: 1500
-                        })
+                    })
 
-                        $('#roleForm').trigger("reset");
-                        $('#RoleModel').modal('hide');
-                        table.draw();
-                    }
+                    $('#PermissionForm').trigger("reset");
+                    $('#PermissionModel').modal('hide');
+                    table.draw();
                 }
+            }
            });
 
         }
 
 
-        // Delete Role
+        // Delete Permission
 
         $('body').on('click', '.deleteProduct', function () {
-        const swalWithBootstrapButtons = Swal.mixin({
-        customClass: {
-            confirmButton: 'btn btn-success',
-            cancelButton: 'btn btn-danger'
-        },
-        buttonsStyling: false})
-        swalWithBootstrapButtons.fire({
-        title: 'Are you sure?',
-        text: "You want to delete it !",
-        icon: 'warning',
-        showCancelButton: true,
-        cancelButtonText: 'No, cancel!',
-        confirmButtonText: 'Yes, delete it!',
-        reverseButtons: true
-        }).then((result) => {
-        if (result.isConfirmed) {
-            swalWithBootstrapButtons.fire(
-            'Deleted!',
-            'Your file has been deleted.',
-            'success'
-            )
-            var roleModel_id = $(this).data("id");
-            $.ajax({
-                type: "DELETE",
-                url: "{{ route('permission.store') }}"+'/'+roleModel_id,
-                success: function (data) {
-                    table.draw();
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success',
+                    cancelButton: 'btn btn-danger'
                 },
-                error: function (data) {
-                    // console.log('Error:', data);
-                }
-            });
+                buttonsStyling: false})
+            swalWithBootstrapButtons.fire({
+                title: 'Are you sure?',
+                text: "You want to delete it !",
+                icon: 'warning',
+                showCancelButton: true,
+                cancelButtonText: 'No, cancel!',
+                confirmButtonText: 'Yes, delete it!',
+                reverseButtons: true
+            }).then((result) => {
+            if (result.isConfirmed) {
+                swalWithBootstrapButtons.fire(
+                'Deleted!',
+                'Your file has been deleted.',
+                'success'
+                )
+                var PermissionModel_id = $(this).data("id");
+                $.ajax({
+                    type: "DELETE",
+                    url: "{{ route('permissions.store') }}"+'/'+PermissionModel_id,
+                    success: function (data) {
+                        table.draw();
+                    }
+                });
 
-        } else if (result.dismiss === Swal.DismissReason.cancel){
-            swalWithBootstrapButtons.fire(
-            'Cancelled',
-            'Your Data is safe :)',
-            'error'
-            )
-        }
-        })
-    });
+            } else if (result.dismiss === Swal.DismissReason.cancel){
+                    swalWithBootstrapButtons.fire(
+                        'Cancelled',
+                        'Your Data is safe :)',
+                        'error'
+                    )
+                }
+            })
+        });
 
            //   Render DataTable
 
       var table = $('#data-table').DataTable({
           processing: true,
           serverSide: true,
-          ajax: "{{ route('permission.index') }}",
+          ajax: "{{ route('permissions.index') }}",
           columns: [
               {data: 'DT_RowIndex', name: 'DT_RowIndex'},
               {data: 'name', name: 'name'},
@@ -286,7 +273,7 @@
       // Error fUNCTION
       function printErrorMsg (msg) {
             $.each( msg, function( key, value ) {
-            $('.'+key+'_err').text(value);
+                $('.'+key+'_err').text(value);
             });
         }
         // Reset Error
