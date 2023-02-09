@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Employee;
+use App\Models\User;
+use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use DataTables;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Company;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\JsonResponse;
 
@@ -28,7 +31,9 @@ class EmployeeController extends Controller
     {
 
         if ($request->ajax()) {
-            $data = Employee::latest()->with('company')->get();
+
+            $data = User::whereNotIn('first_name', ['admin','subadmin'])->with(['company'],['roles'])->latest()->get();
+
             return Datatables::of($data)
                 ->editColumn('company', function ($data) {
                     return $data->company ? ucfirst($data->company->name) : "";
@@ -49,8 +54,9 @@ class EmployeeController extends Controller
         }
 
         $companies = Company::all();
+        $roles = Role::whereNotIn('name', ['admin','subadmin'])->get();
 
-        return view('employee.index',compact('companies'));
+        return view('employee.index',compact('companies', 'roles'));
     }
 
     /**
@@ -71,18 +77,20 @@ class EmployeeController extends Controller
      */
     public function store(Request $request)
     {
+        // dd($request->all());
         $validator = Validator::make($request->all(), [
-            'fname' => 'required',
-            'lname' => 'required',
-            'company_id'=>'required',
-            'email'=> 'nullable|email',
-            'phone' => 'numeric|digits:11'
+            'first_name' => 'required',
+            'last_name' => 'required',
+            'company_id' => 'required',
+            'role_id' => 'required',
+            'email'=> 'email|unique:users',
+            'phone' => 'bail|numeric|digits:11|unique:users',
+            'password' => ['bail', 'required', 'min:8']
 
-        ],
-        [
-            'company_id.required' => 'Company field is required.'
+        ],[
+            'company_id.required' => 'Company Feild is Required !',
+            'role_id.required' => 'Role Feild is Required !'
         ]
-
     );
         if($validator->fails())
         {
@@ -92,7 +100,11 @@ class EmployeeController extends Controller
             ]);
         }
         try {
-            Employee::create($request->all());
+
+            $password = Hash::make($request->password);
+            $request->merge(['password' => $password]);
+            $user = User::create($request->all());
+            $user->roles()->sync($request->role_id);
             return response()->json([
                 'status' =>JsonResponse::HTTP_OK,
                 'message' => 'Data Added sucessfully'
@@ -124,7 +136,7 @@ class EmployeeController extends Controller
      */
     public function edit($id)
     {
-        $employee = Employee::with('company')->findOrfail($id);
+        $employee = User::with(['company', 'roles'])->findOrfail($id);
         return response()->json($employee);
 
     }
@@ -139,8 +151,10 @@ class EmployeeController extends Controller
     public function update(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'fname' => 'required',
-            'lname' => 'required'
+            'first_name' => 'required',
+            'last_name' => 'required',
+            'email'=> 'email|unique:employee',
+            'phone' => 'bail|numeric|digits:11|unique:employee'
         ]);
         if($validator->fails())
         {
@@ -150,8 +164,11 @@ class EmployeeController extends Controller
             ]);
         }
         try {
-            $employee = Employee::findOrfail($id);
+            $password = Hash::make($request->password);
+            $request->merge(['password' => $password]);
+            $employee = User::findOrfail($id);
             $employee->update($request->all());
+            $employee->roles()->sync($request->role_id);
             return response()->json([
                 'status' =>JsonResponse::HTTP_OK,
                 'message' => 'Data Updated sucessfully'
@@ -175,9 +192,9 @@ class EmployeeController extends Controller
     public function destroy($id)
     {
         try {
-            $employee = Employee::find($id);
-            $employee->fname = Hash::make($employee->fname);
-            $employee->lname = Hash::make($employee->lname);
+            $employee = User::find($id);
+            $employee->first_name = Hash::make($employee->fname);
+            $employee->last_name = Hash::make($employee->lname);
             $employee->phone = Hash::make($employee->phone);
             $employee->email = Hash::make($employee->email);
             $employee->save();

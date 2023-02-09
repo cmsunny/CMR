@@ -5,29 +5,11 @@
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Employee</h1>
-        {{-- <button type="button" class="btn btn-primary" href="javascript:void(0)" data-toggle="modal" data-target="#modalDefault" id="createNewProduct">Add Data</button> --}}
+        @can('create_employee')
+
         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalDefault" id="createNewProduct">Add Data</button>
+        @endcan
     </div>
-    {{-- <div class="card-header">
-        <div class="row">
-            <div class="col col-md-6"></div>
-            <div class="col col-md-6 text-right">
-                @if(request()->has('view_deleted'))
-
-                <a href="{{ route('employee.index') }}" class="btn btn-info btn-sm">View All Post</a>
-
-                <a href="{{ route('employee.restore_all') }}" class="btn btn-success btn-sm">Restore All</a>
-
-                @else
-
-                <a href="{{ route('employee.index', ['view_deleted' => 'DeletedRecords']) }}" class="btn btn-dark active btn-sm ">Delete Record</a>
-
-                @endif
-
-            </div>
-        </div>
-    </div> --}}
-
     <div class="card card-preview">
         <div class="card-inner table-responsive">
             <table class=" data-table nowrap table dataTable no-footer  collapsed" >
@@ -36,6 +18,8 @@
                         <th>No</th>
                         <th>First Name</th>
                         <th>Last Name</th>
+                        {{-- <th>Password</th> --}}
+                        {{-- <th>Role</th> --}}
                         <th>Company</th>
                         <th>Email</th>
                         <th>Phone</th>
@@ -60,39 +44,31 @@
             </div>
             <div class="modal-body">
                 <form id="productForm" name="productForm" class="form-horizontal">
-                   <input type="hidden" name="product_id" id="product_id">
+                   <input type="hidden" name="employee_id" id="employee_id">
                     <div class="form-group">
-                        <label for="fname" class="col-sm-2 control-label">FirstName</label>
+                        <label for="first_name" class="col-sm-2 control-label">FirstName</label>
                         <div class="col-sm-12">
-                            <input type="text" class="form-control" id="fname" name="fname" placeholder="Enter FirstName" value="" maxlength="50">
-                            <span class="text-danger error-text fname_err"></span>
+                            <input type="text" class="form-control" id="first_name" name="first_name" placeholder="Enter FirstName" value="" maxlength="50">
+                            <span class="text-danger error-text first_name_err"></span>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="lname" class="col-sm-2 control-label">LastName</label>
+                        <label for="last_name" class="col-sm-2 control-label">LastName</label>
                         <div class="col-sm-12">
-                            <input type="text" class="form-control" id="lname" name="lname" placeholder="Enter LastName" value="" maxlength="50">
-                            <span class="text-danger error-text lname_err"></span>
+                            <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Enter LastName" value="" maxlength="50">
+                            <span class="text-danger error-text last_name_err"></span>
                             <div></div>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="company" class="col-sm-2 control-label">Company</label>
+                        <label for="password" class="col-sm-2 control-label">Password</label>
                         <div class="col-sm-12">
-                            <select id="company_id" class="form-select" data-search="on" name="company_id" >
-                                <option value="default_option" >Select Companies </option>
-                                @foreach ($companies as $company)
-                                    <option value="{{$company->id}}">{{$company->name}}</option>
-                                @endforeach
-{{--
-                                    @foreach($users as $user)
-                                        <option value="{{ $user->id }}" {{ $user->id == $order->user_id ? 'selected' : '' }}>{{ $user->name }}</option>
-                                    @endforeach --}}
-
-                              </select>
-                            <span class="text-danger error-text company_id_err"></span>
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Enter Password" value="" >
+                            <span class="text-danger error-text password_err"></span>
+                            <div></div>
                         </div>
                     </div>
+
                     <div class="form-group">
                         <label for="email" class="col-sm-2 control-label">Email</label>
                         <div class="col-sm-12">
@@ -100,7 +76,30 @@
                             <span class="text-danger error-text email_err"></span>
                         </div>
                     </div>
-
+                    <div class="form-group">
+                        <label for="role" class="col-sm-2 control-label">Role</label>
+                        <div class="col-sm-12">
+                            <select id="role_id" class="form-control" placeholder="Select Roles" name="role_id" >
+                                <option value="" >Select role </option>
+                                @foreach ($roles as $role)
+                                    <option value="{{$role->id}}">{{$role->name}}</option>
+                                @endforeach
+                              </select>
+                            <span class="text-danger error-text role_id_err"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="company" class="col-sm-2 control-label">Company</label>
+                        <div class="col-sm-12">
+                            <select id="company_id" class="form-select" data-search="on" name="company_id" >
+                                <option value="" >Select Companies </option>
+                                @foreach ($companies as $company)
+                                    <option value="{{$company->id}}">{{$company->name}}</option>
+                                @endforeach
+                              </select>
+                            <span class="text-danger error-text company_id_err"></span>
+                        </div>
+                    </div>
                     <div class="form-group">
                         <label class="col-sm-2 control-label">Phone</label>
                         <div class="col-sm-12">
@@ -113,6 +112,7 @@
                      <button type="button" class="btn btn-primary add-employee" id="saveBtn" value="create">Save
                      </button>
                     </div>
+
                 </form>
             </div>
         </div>
@@ -140,29 +140,32 @@
         //   Click to Button
         $('#createNewProduct').click(function () {
             $('#saveBtn').val("create-product");
-            $('#product_id').val('');
+            $('#employee_id').val('');
             $('#productForm').trigger("reset");
             $('#modelHeading').html("Create New Data");
-            $("#company_id").val('default_option').trigger("change");
+            $("#company_id").val('').trigger("change");
+            // $("#role_id").val('').trigger("change");
             $('#ajaxModel').modal('show');
             resetErrorMessag();
         });
 
            //   Click to Edit Button
           $('body').on('click', '.editProduct', function () {
-            var product_id = $(this).data('id');
-            $.get("{{ route('employee.index') }}" +'/' + product_id +'/edit', function (data) {
+            resetErrorMessag();
+            var employee_id = $(this).data('id');
+            $.get("{{ route('employee.index') }}" +'/' + employee_id +'/edit', function (data) {
                 $('#modelHeading').html("Edit Employee");
                 $('#saveBtn').val("edit-user");
                 $('#ajaxModel').modal('show');
-                $('#product_id').val(data.id);
-                $('#fname').val(data.fname);
-                $('#lname').val(data.lname);
+                $('#employee_id').val(data.id);
+                $('#first_name').val(data.first_name);
+                $('#last_name').val(data.last_name);
+                $('#role_id').val(data.roles[0].id);
                 $('#company_id').val(data.company_id);
                 $('#company_id').trigger('change')
                 $('#email').val(data.email);
                 $('#phone').val(data.phone);
-                resetErrorMessag();
+
             });
           });
 
@@ -170,7 +173,7 @@
           $('#saveBtn').click(function (e) {
               e.preventDefault();
               $(this).html('Save');
-              var id = $("#product_id").val()
+              var id = $("#employee_id").val()
               if(id) {
 
                 updateCompnay(id);
@@ -272,10 +275,10 @@
                 'Your file has been deleted.',
                 'success'
                 )
-                var product_id = $(this).data("id");
+                var employee_id = $(this).data("id");
                 $.ajax({
                     type: "DELETE",
-                    url: "{{ route('employee.store') }}"+'/'+product_id,
+                    url: "{{ route('employee.store') }}"+'/'+employee_id,
                     success: function (data) {
                         table.draw();
                     },
@@ -300,8 +303,10 @@
           ajax: "{{ route('employee.index') }}",
           columns: [
               {data: 'DT_RowIndex', name: 'DT_RowIndex'},
-              {data: 'fname', name: 'fname'},
-              {data: 'lname', name: 'lname'},
+              {data: 'first_name', name: 'first_name'},
+              {data: 'last_name', name: 'last_name'},
+            //   {data: 'password', name: 'password'},
+            //   {data: 'role', name: 'role_id'},
               {data: 'company', name: 'company_id'},
               {data: 'email', name: 'email'},
               {data: 'phone', name: 'phone'},
@@ -319,9 +324,11 @@
       }
 
       function resetErrorMessag() {
-        $('.fname_err').text('');
-        $('.lname_err').text('');
-        $('.company_err').text('');
+        $('.first_name_err').text('');
+        $('.last_name_err').text('');
+        $('.company_id_err').text('');
+        $('.password_err').text('');
+        $('.role_id_err').text('');
         $('.email_err').text('');
         $('.phone_err').text('');
       }

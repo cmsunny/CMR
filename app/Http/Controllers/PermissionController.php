@@ -73,7 +73,7 @@ class PermissionController extends Controller
         try {
              Permission::create([
                 'name' =>  str_replace(' ', '_', $request->input('name')),
-                'title' => $request->title,
+
             ]);
 
             return response()->json([

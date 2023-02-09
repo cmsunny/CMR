@@ -21,20 +21,21 @@
                     <li class="nk-menu-heading">
                         <h6 class="overline-title text-primary-alt">Dashboards</h6>
                     </li>
+                    @can('list_company')
                     <li class="nk-menu-item">
                         <a href="{{ route('role.index') }}" class="nk-menu-link">
                             <span class="nk-menu-icon"><em class="icon ni ni-dashlite"></em></span>
                             <span class="nk-menu-text">Roles</span>
                         </a>
                     </li>
-                    <li class="nk-menu-item">
+                    {{-- <li class="nk-menu-item">
                         <a href="{{ route('permissions.index') }}" class="nk-menu-link">
                             <span class="nk-menu-icon"><em class="icon ni ni-dashlite"></em></span>
                             <span class="nk-menu-text">Permissions</span>
                         </a>
-                    </li>
+                    </li> --}}
 
-                    @can('list_company')
+
                     <li class="nk-menu-item">
                         <a href="{{ route('company.index') }}" class="nk-menu-link">
                             <span class="nk-menu-icon"><em class="icon ni ni-dashlite"></em></span>
@@ -42,6 +43,7 @@
                         </a>
                     </li>
                     @endcan
+
                     <!-- .nk-menu-item -->
                     <li class="nk-menu-item">
                         <a href="{{ route('employee.index') }}" class="nk-menu-link">

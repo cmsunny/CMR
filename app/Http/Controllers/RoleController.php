@@ -75,7 +75,7 @@ class RoleController extends Controller
         try {
             $new_role = Role::create([
                 'name' => $request->name,
-                'title' => $request->title,
+
             ]);
             $new_role->permissions()->sync($request->permission);
             return response()->json([
@@ -109,7 +109,7 @@ class RoleController extends Controller
     public function edit($id)
     {
         try{
-        $role = Role::with('permissions')->get()->findOrfail($id);
+        $role = Role::with('permissions')->get()->find($id);
         $permissions = Permission::all();
             // dd($role);
         return response()->json([

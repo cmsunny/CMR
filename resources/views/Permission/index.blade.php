@@ -15,7 +15,6 @@
                     <tr>
                         <th>No</th>
                         <th>Name</th>
-                        <th>Title</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -45,15 +44,6 @@
                         </div>
 
                     </div>
-                    <div class="form-group">
-                        <label for="title" class="col-sm-2 control-label">Title</label>
-                        <div class="col-sm-12">
-                            <input type="text" class="form-control title" id="title" name="title" placeholder="Enter Title" value="" maxlength="50" >
-                            <span class="text-danger error-text title_err"></span>
-                        </div>
-
-                    </div>
-
                     <div class="col-sm-offset-2 col-sm-10">
 
                      <button type="submit" class="btn btn-primary saveButton" data-toggle="modal" data-target="#modalDefault" id="saveBtn">Save Data</button>
@@ -264,7 +254,6 @@
           columns: [
               {data: 'DT_RowIndex', name: 'DT_RowIndex'},
               {data: 'name', name: 'name'},
-              {data: 'title', name: 'title'},
               {data: 'action', name: 'action', orderable: false, searchable: false},
 
           ]

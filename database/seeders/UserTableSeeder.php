@@ -15,13 +15,13 @@ class UserTableSeeder extends Seeder
     public function run()
     {
         $admin = User::create([
-            'name' => 'ali',
+            'first_name' => 'admin',
             'email' => 'admin@gmail.com',
             'password' => Hash::make('123456')
         ]);
         $admin->assignRole('admin');
         $subadmin = User::create([
-            'name' => 'ali',
+            'first_name' => 'SubAdmin',
             'email' => 'subadmin@gmail.com',
             'password' => Hash::make('123456')
         ]);

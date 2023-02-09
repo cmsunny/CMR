@@ -15,7 +15,6 @@
                     <tr>
                         <th>No</th>
                         <th>Name</th>
-                        <th>Title</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -45,15 +44,6 @@
                         </div>
 
                     </div>
-                    <div class="form-group">
-                        <label for="title" class="col-sm-2 control-label">Title</label>
-                        <div class="col-sm-12">
-                            <input type="text" class="form-control" id="title" name="title" placeholder="Enter Title" value="" maxlength="50" >
-                            <span class="text-danger error-text email_err"></span>
-                        </div>
-
-                    </div>
-
                     <div class="form-group">
                         <label for="company" class="col-sm-2 control-label"><strong>Permissions:</strong></label>
                         <div class="col-sm-12" id="permissions">
@@ -143,9 +133,10 @@
             for (let i = 0; i < data.permissions.length; ++i){
                 var className = "checkbox-input";
                 var fullClassName = className + data.permissions[i]['id'];
-                $('#permissions').append('<input type="checkbox"  class="' + fullClassName + '" value="'+data.permissions[i]['id']+'" name="permission[]">  <label for="w" class="text-capitalize">'+data.permissions[i]['name']+' </label> <br>' );
+                $('#permissions').append('<input type="checkbox"  class="' + fullClassName + '" id="permission'+ data.permissions[i]['id'] +'" value="'+data.permissions[i]['id']+'" name="permission[]">  <label for="permission'+ data.permissions[i]['id'] +'" class="text-capitalize">'+data.permissions[i]['name'].replace('_', ' ')+' </label> <br>' );
                 if(assignedPermissions){
                     if(assignedPermissions.find((permission) => permission.id == data.permissions[i]['id'])) {
+
                         $('.'+fullClassName).prop('checked', true);
                     }
                 }
@@ -303,7 +294,6 @@
           columns: [
               {data: 'DT_RowIndex', name: 'DT_RowIndex'},
               {data: 'name', name: 'name'},
-              {data: 'title', name: 'title'},
               {data: 'action', name: 'action', orderable: false, searchable: false},
 
           ]

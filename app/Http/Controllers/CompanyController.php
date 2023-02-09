@@ -73,7 +73,7 @@ class CompanyController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'email' => 'required|email|unique:companies',
-            'image' => "required|dimensions:width=$width,height:$height|max:$size",
+            'image' => "bail|required|dimensions:width=$width,height:$height|max:$size",
             'website' => 'required|url'
         ],[
             'image.dimensions'=>'Image dimensions must be 100 x 200',
