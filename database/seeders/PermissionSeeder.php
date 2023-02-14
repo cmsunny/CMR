@@ -54,7 +54,27 @@ class PermissionSeeder extends Seeder
                 'name' => 'delete_company',
                 'guard_name' => 'web',
                 'group'=>'company',
-            ]
+            ],
+            [
+                'name' => 'list_role',
+                'guard_name' => 'web',
+                'group'=>'employee',
+             ],
+             [
+                 'name' => 'create_role',
+                 'guard_name' => 'web',
+                 'group'=>'employee',
+             ],
+             [
+                 'name' => 'edit_role',
+                 'guard_name' => 'web',
+                 'group'=>'employee',
+             ],
+             [
+                 'name' => 'delete_role',
+                 'guard_name' => 'web',
+                 'group'=>'employee',
+             ],
 
         ];
       foreach($permissions as $permission){

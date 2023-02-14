@@ -2,7 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployeeController;
+// use App\Http\Controllers\GraphController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
 
@@ -29,6 +31,7 @@ Route::resource('company', CompanyController::class);
 Route::resource('employee', EmployeeController::class);
 Route::resource('role', RoleController::class);
 Route::resource('permissions', PermissionController::class);
+Route::resource('dashboard', DashboardController::class);
 
 });
 require __DIR__.'/auth.php';

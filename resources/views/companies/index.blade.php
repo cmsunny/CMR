@@ -5,7 +5,9 @@
 <div class="nk-block nk-block-lg">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Companies</h1>
+        @can('create_company')
         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalDefault" id="createNewProduct">Add Data</button>
+        @endcan
     </div>
 
     {{-- <div class="card-header">
@@ -39,8 +41,9 @@
                         <th>Email</th>
                         <th>Logo</th>
                         <th>Website</th>
+                        @can('edit_company','delete_company')
                         <th>Action</th>
-
+                        @endcan
                     </tr>
                 </thead>
                 <tbody>
@@ -327,7 +330,9 @@
                 {data: 'email', name: 'email'},
                 {data: 'image', name: 'image'},
                 {data: 'website', name: 'website'},
+                @can('edit_company','delete_company')
                 {data: 'action', name: 'action', orderable: false, searchable: false},
+                @endcan
             ]
         });
 

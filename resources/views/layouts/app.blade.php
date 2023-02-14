@@ -66,6 +66,7 @@
         {{-- Theme JS files --}}
         <script src="{{ asset('assets/js/bundle.js') }}"></script>
         <script src="{{ asset('assets/js/scripts.js') }}"></script>
+        <script src="{{ asset('assets/js/example-chart.js') }}"></script>
         <script src="{{ asset('assets/libs/datatable-btns.js') }}"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.10/js/select2.min.js"></script>
 

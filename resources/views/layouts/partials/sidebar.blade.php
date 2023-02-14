@@ -19,15 +19,19 @@
                 <ul class="nk-menu">
 
                     <li class="nk-menu-heading">
-                        <h6 class="overline-title text-primary-alt">Dashboards</h6>
+
+                        <h6 class="overline-title text-primary-alt"><a href="{{ route('dashboard.index') }}" >Dashboard</a></h6>
+
                     </li>
-                    @can('list_company')
+
+                    @can('list_role')
                     <li class="nk-menu-item">
                         <a href="{{ route('role.index') }}" class="nk-menu-link">
                             <span class="nk-menu-icon"><em class="icon ni ni-dashlite"></em></span>
                             <span class="nk-menu-text">Roles</span>
                         </a>
                     </li>
+                    @endcan
                     {{-- <li class="nk-menu-item">
                         <a href="{{ route('permissions.index') }}" class="nk-menu-link">
                             <span class="nk-menu-icon"><em class="icon ni ni-dashlite"></em></span>
@@ -35,7 +39,7 @@
                         </a>
                     </li> --}}
 
-
+                    @can('list_company')
                     <li class="nk-menu-item">
                         <a href="{{ route('company.index') }}" class="nk-menu-link">
                             <span class="nk-menu-icon"><em class="icon ni ni-dashlite"></em></span>
@@ -45,12 +49,14 @@
                     @endcan
 
                     <!-- .nk-menu-item -->
+                    @can('list_employee')
                     <li class="nk-menu-item">
                         <a href="{{ route('employee.index') }}" class="nk-menu-link">
                             <span class="nk-menu-icon"><em class="icon ni ni-dashlite"></em></span>
                             <span class="nk-menu-text">Employee</span>
                         </a>
                     </li><!-- .nk-menu-item -->
+                    @endcan
 
 
 

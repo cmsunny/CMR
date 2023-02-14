@@ -5,7 +5,9 @@
 <div class="nk-block nk-block-lg">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Roles</h1>
+        @can('create_role')
         <button type="button" class="btn btn-primary createNewRole" id="NewRole">Add New</button>
+        @endcan
     </div>
 
     <div class="card card-preview">
@@ -15,7 +17,9 @@
                     <tr>
                         <th>No</th>
                         <th>Name</th>
+                        @can('edit_role','delete_role')
                         <th>Action</th>
+                        @endcan
                     </tr>
                 </thead>
                 <tbody>
@@ -258,28 +262,35 @@
         reverseButtons: true
         }).then((result) => {
         if (result.isConfirmed) {
-            swalWithBootstrapButtons.fire(
-            'Deleted!',
-            'Your file has been deleted.',
-            'success'
-            )
+
             var roleModel_id = $(this).data("id");
             $.ajax({
                 type: "DELETE",
                 url: "{{ route('role.store') }}"+'/'+roleModel_id,
                 success: function (data) {
                     table.draw();
+                    swalWithBootstrapButtons.fire(
+                        'Deleted!',
+                        'Your file has been deleted.',
+                        'success'
+                    )
+
                 },
                 error: function (data) {
-                    // console.log('Error:', data);
+                    swalWithBootstrapButtons.fire(
+                        'Sorry you cant delete Role!',
+                        'You Assign Some Permissions :)',
+                        'error'
+                    )
                 }
             });
 
+
         } else if (result.dismiss === Swal.DismissReason.cancel){
             swalWithBootstrapButtons.fire(
-            'Cancelled',
-            'Your Data is safe :)',
-            'error'
+                'Cancelled',
+                'Your Data is safe :)',
+                'error'
             )
         }
         })
@@ -294,7 +305,10 @@
           columns: [
               {data: 'DT_RowIndex', name: 'DT_RowIndex'},
               {data: 'name', name: 'name'},
+              @can('edit_role','delete_role')
               {data: 'action', name: 'action', orderable: false, searchable: false},
+              @endcan
+
 
           ]
       });
