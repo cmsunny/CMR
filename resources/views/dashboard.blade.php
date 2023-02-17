@@ -3,16 +3,13 @@
 @section('content')
 <div class="nk-block nk-block-lg">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Graph</h1>
+        <h1>Dashboard</h1>
     </div>
     <div class="row g-gs">
         <div class="col-md-12">
             <div class="card card-preview">
                 <div class="card-inner">
                     <div class="card-head">
-                        {{-- @foreach ($items as $key => $value)
-                            {{$value['count']}}
-                        @endforeach --}}
                         <h6 class="title">Employee Graph</h6>
                     </div>
                     <div class="nk-ck-sm">
